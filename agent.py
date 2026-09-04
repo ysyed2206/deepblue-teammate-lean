@@ -15,12 +15,20 @@ Two reliability commitments shape this file.
     but the referee claims threefold automatically on either, so recording only
     our own turns loses won games to draws we never saw coming.
 
-S1 engine, and why warm_up() is called eagerly below: FastEngine18's search/
-quiescence/negamax are Numba-JIT-compiled on first use (~50-53s measured
-cold, after compile-time fixes -- see EXPERIMENTS.md). That cost MUST land
-inside this file's own 60s import budget, not the first move's clock -- so
-warm_up() runs here, at import time, rather than being left to fire lazily
-on the first get_move() call.
+S1 engine, and why warm_up() is called eagerly below: FastEngine30's search/
+quiescence/negamax are Numba-JIT-compiled on first use (~35-48s measured on
+a real Linux runner -- see the fastsearch30 module docstring and
+nnue_lab/teammate_pawnstar/scratch_train/ for the training record). That
+cost MUST land inside this file's own 60s import budget, not the first
+move's clock -- so warm_up() runs here, at import time, rather than being
+left to fire lazily on the first get_move() call.
+
+fastsearch30 = fastsearch18 (the validated PVS/RFP/TT/qsearch search, see
+EXPERIMENTS.md) with the hand-crafted evaluation replaced by an NNUE
+evaluator trained strictly from random initialization on this team's own
+downloaded, engine-annotated data (no third-party trained weights anywhere
+in this lineage -- see nnue_lab/teammate_pawnstar/scratch_train/ for the
+full training/quantisation record).
 """
 
 from __future__ import annotations
@@ -31,9 +39,9 @@ import traceback
 
 import chess
 
-from deepblue import fastsearch18
+from deepblue import fastsearch30
 from deepblue.fastcore import from_fen
-from deepblue.fastsearch18 import FastEngine18
+from deepblue.fastsearch30 import FastEngine30
 from deepblue.time_manager import allocate
 
 # The published time control is 120 s + 0.5 s/move, but the agent API is only
@@ -45,8 +53,8 @@ from deepblue.time_manager import allocate
 # actually moves, and the published value is only the starting assumption.
 DEFAULT_INCREMENT_MS = 500
 
-_engine = FastEngine18()
-fastsearch18.warm_up()  # forces the Numba JIT compile now, inside the import budget
+_engine = FastEngine30()
+fastsearch30.warm_up()  # forces the Numba JIT compile now, inside the import budget
 _moves_played = 0
 _increment_ms = float(DEFAULT_INCREMENT_MS)
 _previous_clock_ms: float | None = None
