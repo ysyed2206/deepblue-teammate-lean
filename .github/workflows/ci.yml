@@ -46,3 +46,30 @@ jobs:
           enable-cache: false
       - run: uv sync
       - run: uv run python tools/fresh_process_test.py --rounds 10
+
+  # Same measurement, but for fastsearch30 (NNUE-integrated) specifically --
+  # agent.py itself still imports fastsearch18, so the job above doesn't
+  # exercise this candidate's own (larger) compiled body.
+  cold-start-timing-nnue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: false
+      - run: uv sync
+      - run: |
+          for i in 1 2 3; do
+            uv run python -c "
+          import time
+          t0 = time.perf_counter()
+          from deepblue.fastsearch30 import FastEngine30
+          from deepblue.fastcore import from_fen
+          t1 = time.perf_counter()
+          engine = FastEngine30()
+          engine.search(from_fen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1'), 40.0, 80.0, max_depth=1)
+          t2 = time.perf_counter()
+          print(f'round $i: import={t1-t0:.2f}s compile+search={t2-t1:.2f}s TOTAL={t2-t0:.2f}s')
+          "
+          done
