@@ -1,0 +1,139 @@
+{
+  "format": "deepblue-nnue-preprocess-manifest-v0",
+  "created_utc": "2026-09-01T04:19:13Z",
+  "source_inputs": [
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0000\\selected.jsonl",
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0004\\selected.jsonl",
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0008\\selected.jsonl",
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0012\\selected.jsonl",
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0016\\selected.jsonl"
+  ],
+  "source_input_sha256": {
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0000\\selected.jsonl": "cc8f7ab83fcecbc71fd5073210e756457d7ff44e970e9b8b50686a76f798ca27",
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0004\\selected.jsonl": "c926770b16796bd48240c699b7af94b6d930bf62e921c51bae95353a38ee7cca",
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0008\\selected.jsonl": "18e7ace2bb30455547de319c585746b800b0331da4b341a907dbcc034f83af40",
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0012\\selected.jsonl": "1d564d565d2a606a6516917febd4b7af815820ec4a60db0f8758e1d250ac43f6",
+    "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0016\\selected.jsonl": "d041da3acaf6916ade22699494d03ec457f982e534ddf779e08fbd5b48332a06"
+  },
+  "orientation_proof": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\manifests\\orientation_verification.json",
+  "orientation_proof_sha256": "bcdabafef866213690b6c33136b933a784a0b0367b38faae1f664f2de3720b29",
+  "target": "side-to-move relative Stockfish cp, clipped before sign conversion",
+  "clip_cp": 2000,
+  "split": "BLAKE2b-64(FEN,key=20260901): 95% train, 2.5% validation, 2.5% test",
+  "sample_order": "BLAKE2b-64(FEN,key=20260902)",
+  "merge": {
+    "input_rows": 800000,
+    "unique_fens": 800000,
+    "cross_input_quality_updates": 0
+  },
+  "counts": {
+    "train": 663682,
+    "validation": 17450,
+    "test": 17441,
+    "clean_total": 698573,
+    "quiet_total": 463690
+  },
+  "clean_rejections_and_notes": {
+    "mate_teacher": 95189,
+    "cp_clipped_not_rejected": 7864,
+    "invalid_board_status_256": 6161,
+    "invalid_board_status_192": 17,
+    "invalid_board_status_64": 9,
+    "invalid_board_status_72": 1,
+    "invalid_board_status_8": 6,
+    "invalid_board_status_16": 16,
+    "invalid_board_status_144": 6,
+    "invalid_board_status_328": 3,
+    "invalid_board_status_24": 19
+  },
+  "quiet_filter": {
+    "definition": "not in check; legal PV first move; first move is not capture, promotion, or check",
+    "all_disqualifying_reasons_overlapping": {
+      "side_to_move_in_check": 44110,
+      "best_move_capture": 171446,
+      "best_move_promotion": 1157,
+      "best_move_gives_check": 46176
+    },
+    "primary_disqualifying_reason_priority_order": {
+      "accepted_quiet": 463690,
+      "side_to_move_in_check": 44110,
+      "best_move_capture": 159602,
+      "best_move_promotion": 996,
+      "best_move_gives_check": 30175
+    }
+  },
+  "datasets": {
+    "pilot_general": {
+      "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\pilot_general.npz",
+      "sha256": "9e7a3fcb79fda9022cb2e915f176573e743a1e8c0e2be4185be4f0709ae18d7b",
+      "bytes": 26200756,
+      "count": 200000,
+      "quiet_count": 132883,
+      "general_nonquiet_count": 67117,
+      "target_min_cp": -2000,
+      "target_max_cp": 2000,
+      "target_mean_cp": 14.668415
+    },
+    "pilot_mixed": {
+      "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\pilot_mixed.npz",
+      "sha256": "e5fb37053c4e29440bbe5d2ed14548fd5ce343c87475a2959132bdc26fbe3dc7",
+      "bytes": 26200756,
+      "count": 200000,
+      "quiet_count": 160000,
+      "general_nonquiet_count": 40000,
+      "target_min_cp": -2000,
+      "target_max_cp": 2000,
+      "target_mean_cp": 8.472215
+    },
+    "final_general": {
+      "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_general.npz",
+      "sha256": "a6dc8d191626096e1ae5f20292c965c05951ad5e1cc85f90978da896e13ec4bf",
+      "bytes": 65500756,
+      "count": 500000,
+      "quiet_count": 331942,
+      "general_nonquiet_count": 168058,
+      "target_min_cp": -2000,
+      "target_max_cp": 2000,
+      "target_mean_cp": 14.584782
+    },
+    "final_mixed": {
+      "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz",
+      "sha256": "4a99714db848c23308510f075af2b93c51a5d02a4c8574f478693ffe1b282ba2",
+      "bytes": 65500756,
+      "count": 500000,
+      "quiet_count": 400000,
+      "general_nonquiet_count": 100000,
+      "target_min_cp": -2000,
+      "target_max_cp": 2000,
+      "target_mean_cp": 8.180596
+    },
+    "validation": {
+      "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\validation.npz",
+      "sha256": "32afa1006db83a9c0f818a3ca9a04aa2ea1aa628193947eabc8313e2411490be",
+      "bytes": 2286706,
+      "count": 17450,
+      "quiet_count": 11489,
+      "general_nonquiet_count": 5961,
+      "target_min_cp": -2000,
+      "target_max_cp": 2000,
+      "target_mean_cp": 15.742578796561604,
+      "fens_path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\validation_fens.jsonl",
+      "fens_sha256": "faa986ae118b56030b19526e20f55037dcda6e656e75e75923d224d8df7a0b0e"
+    },
+    "test": {
+      "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\test.npz",
+      "sha256": "f863cfc89262bb1b0d2973f775ce32393ed129b4c8c2d5e50d0b45f44e16b2c7",
+      "bytes": 2285527,
+      "count": 17441,
+      "quiet_count": 11469,
+      "general_nonquiet_count": 5972,
+      "target_min_cp": -2000,
+      "target_max_cp": 2000,
+      "target_mean_cp": 16.819104409150853,
+      "fens_path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\test_fens.jsonl",
+      "fens_sha256": "5ccfb441670ca6cc622b1167bcb332916f9970c6d4b1855af35e366b8b64481d"
+    }
+  },
+  "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\processed.sqlite3",
+  "elapsed_seconds": 593.90683729999
+}

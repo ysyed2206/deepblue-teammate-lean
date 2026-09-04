@@ -1,0 +1,33 @@
+{
+  "format": "deepblue-nnue-data-manifest-v0",
+  "created_utc": "2026-09-01T03:46:03Z",
+  "source": "https://huggingface.co/datasets/Lichess/chess-position-evaluations",
+  "source_revision": "abb8f0b1251f89295a35b5ac801cb08a873812de",
+  "source_file": "https://huggingface.co/datasets/Lichess/chess-position-evaluations/resolve/abb8f0b1251f89295a35b5ac801cb08a873812de/data/data_0000.parquet?download=true",
+  "license": "CC0-1.0",
+  "remote_file_bytes": 2118195009,
+  "source_etag": "\"180088f9417b96bf2122454a82dbd898102a10cac3d6e9234508b4d4eddd13ad\"",
+  "source_last_modified": null,
+  "downloaded_bytes": 71374657,
+  "http_range_requests": 3,
+  "download_cap_bytes": 150000000,
+  "raw_rows_scanned": 16884,
+  "unique_fens": 2000,
+  "requested_unique_fens": 2000,
+  "reappearing_fen_groups": 0,
+  "selection": "max(depth, then knodes), first row within that analysis/MultiPV group",
+  "ordering_audit": {
+    "multipv_groups_checked": 2582,
+    "white_groups": 1318,
+    "black_groups": 1264,
+    "first_is_stm_best_count": 2582,
+    "first_is_stm_best_rate": 1.0,
+    "fully_monotonic_count": 2575,
+    "fully_monotonic_rate": 0.9972889233152595
+  },
+  "elapsed_seconds": 29.314795700018294,
+  "rows_per_second": 575.9548922931591,
+  "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\smoke2\\selected.jsonl",
+  "selected_jsonl_sha256": "53401f891f3fc570477634ca846f61fae8a96ba30e491506970e820d45faf286",
+  "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\smoke2\\selected.sqlite3"
+}

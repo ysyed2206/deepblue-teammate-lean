@@ -1,0 +1,151 @@
+{
+  "format": "deepblue-perspective-chess768-training-summary-v1",
+  "created_utc": "2026-09-02T14:33:18Z",
+  "architecture": {
+    "name": "PerspectiveChess768-SCReLU",
+    "width": 256,
+    "num_features": 768,
+    "perspectives": 2,
+    "max_active_features_per_perspective": 32,
+    "shared_feature_transformer": true,
+    "accumulator_order": [
+      "white",
+      "black"
+    ],
+    "tail_order": [
+      "side_to_move",
+      "non_side_to_move"
+    ],
+    "activation": "clamp(x,0,1)^2",
+    "output": "single scalar centipawns from side-to-move perspective",
+    "evaluation_scale_cp": 400,
+    "parameter_count": 197377
+  },
+  "objective": "MSE(sigmoid(predicted_cp/400), sigmoid(side_to_move_teacher_cp/400)); no game-result blending",
+  "config": {
+    "command": "'C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\train.py' --train-data 'C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz' --validation-data 'C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\validation.npz' --run-dir 'nnue_lab\\production\\smoke_training_stack' --width 256 --epochs 2 --batch-size 512 --validation-batch-size 512 --threads 2 --seed 20260910 --patience 2 --maximum-train-examples 4096 --maximum-validation-examples 1024 --legacy-chessbuckets-mod768 --stage-name smoke --resume",
+    "stage_name": "smoke",
+    "width": 256,
+    "seed": 20260910,
+    "epochs_requested": 2,
+    "batch_size": 512,
+    "validation_batch_size": 512,
+    "learning_rate": 0.001,
+    "weight_decay": 1e-05,
+    "lr_milestones": [],
+    "lr_gamma": 0.3,
+    "patience": 2,
+    "minimum_delta": 1e-07,
+    "threads": 2,
+    "legacy_chessbuckets_mod768": true,
+    "maximum_train_examples": 4096,
+    "maximum_validation_examples": 1024
+  },
+  "data": {
+    "train": [
+      {
+        "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz",
+        "sha256": "4a99714db848c23308510f075af2b93c51a5d02a4c8574f478693ffe1b282ba2",
+        "bytes": 65500756,
+        "examples": 500000,
+        "legacy_chessbuckets_mod768": true
+      }
+    ],
+    "validation": [
+      {
+        "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\validation.npz",
+        "sha256": "32afa1006db83a9c0f818a3ca9a04aa2ea1aa628193947eabc8313e2411490be",
+        "bytes": 2286706,
+        "examples": 17450,
+        "legacy_chessbuckets_mod768": true
+      }
+    ],
+    "train_examples_per_epoch": 4096,
+    "validation_examples": 1024
+  },
+  "stage_history": [
+    {
+      "stage_name": "smoke",
+      "started_utc": "2026-09-02T14:21:44Z",
+      "start_epoch": 1,
+      "train_examples_per_epoch": 4096,
+      "train_shards": [
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz",
+          "sha256": "4a99714db848c23308510f075af2b93c51a5d02a4c8574f478693ffe1b282ba2",
+          "bytes": 65500756,
+          "examples": 500000,
+          "legacy_chessbuckets_mod768": true
+        }
+      ],
+      "allow_data_expansion": false,
+      "command": "'C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\train.py' --train-data 'C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz' --validation-data 'C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\validation.npz' --run-dir 'nnue_lab\\production\\smoke_training_stack' --width 256 --epochs 1 --batch-size 512 --validation-batch-size 512 --threads 2 --seed 20260910 --patience 2 --maximum-train-examples 4096 --maximum-validation-examples 1024 --legacy-chessbuckets-mod768 --stage-name smoke"
+    },
+    {
+      "stage_name": "smoke",
+      "started_utc": "2026-09-02T14:33:16Z",
+      "start_epoch": 2,
+      "train_examples_per_epoch": 4096,
+      "train_shards": [
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz",
+          "sha256": "4a99714db848c23308510f075af2b93c51a5d02a4c8574f478693ffe1b282ba2",
+          "bytes": 65500756,
+          "examples": 500000,
+          "legacy_chessbuckets_mod768": true
+        }
+      ],
+      "allow_data_expansion": false,
+      "stage_index": 2,
+      "command": "'C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\train.py' --train-data 'C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz' --validation-data 'C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\validation.npz' --run-dir 'nnue_lab\\production\\smoke_training_stack' --width 256 --epochs 2 --batch-size 512 --validation-batch-size 512 --threads 2 --seed 20260910 --patience 2 --maximum-train-examples 4096 --maximum-validation-examples 1024 --legacy-chessbuckets-mod768 --stage-name smoke --resume"
+    }
+  ],
+  "epochs_completed_this_invocation": 1,
+  "epochs_completed_total": 2,
+  "best_epoch": 2,
+  "best_validation_probability_mse": 0.023854768835008144,
+  "best_validation_teacher_mae_cp": 196.03716278076172,
+  "total_training_seconds": 2.5782499000197276,
+  "invocation_wall_seconds": 1.4077853999333456,
+  "mean_training_examples_per_second": 3177.349100231641,
+  "total_examples_seen": 8192,
+  "best_checkpoint": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\smoke_training_stack\\best.pt",
+  "best_checkpoint_bytes": 2393264,
+  "latest_checkpoint": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\smoke_training_stack\\latest.pt",
+  "latest_checkpoint_bytes": 2393694,
+  "log": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\smoke_training_stack\\train.jsonl",
+  "history": [
+    {
+      "event": "epoch",
+      "epoch": 1,
+      "learning_rate": 0.001,
+      "next_learning_rate": 0.001,
+      "train_probability_mse": 0.02429320360533893,
+      "validation_probability_mse": 0.02418054360896349,
+      "validation_teacher_mae_cp": 198.45538330078125,
+      "training_examples": 4096,
+      "validation_examples": 1024,
+      "training_seconds": 1.2821813999908045,
+      "validation_seconds": 0.06863669992890209,
+      "training_examples_per_second": 3194.555778167875,
+      "validation_examples_per_second": 14919.132199839432,
+      "best": true
+    },
+    {
+      "event": "epoch",
+      "epoch": 2,
+      "learning_rate": 0.001,
+      "next_learning_rate": 0.001,
+      "train_probability_mse": 0.024778030579909682,
+      "validation_probability_mse": 0.023854768835008144,
+      "validation_teacher_mae_cp": 196.03716278076172,
+      "training_examples": 4096,
+      "validation_examples": 1024,
+      "training_seconds": 1.2960685000289232,
+      "validation_seconds": 0.06766770000103861,
+      "training_examples_per_second": 3160.326788212655,
+      "validation_examples_per_second": 15132.773834255973,
+      "best": true
+    }
+  ]
+}

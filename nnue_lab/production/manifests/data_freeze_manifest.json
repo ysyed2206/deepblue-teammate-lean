@@ -1,0 +1,390 @@
+{
+  "format": "deepblue-nnue-production-staging-freeze-v1",
+  "stage": "stage-1-completed-3m-acquisitions",
+  "status": "staging corpus; deterministic append-compatible split, not final ceiling",
+  "created_utc": "2026-09-02T14:37:45Z",
+  "network_used": false,
+  "resumed_after_validation_edge_case": true,
+  "source": {
+    "dataset": "Lichess/chess-position-evaluations",
+    "revision": "abb8f0b1251f89295a35b5ac801cb08a873812de",
+    "license": "CC0-1.0",
+    "old_exclusion_inputs": [
+      {
+        "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0000\\selected.jsonl",
+        "selected_jsonl_bytes": 29420479,
+        "selected_jsonl_sha256": "cc8f7ab83fcecbc71fd5073210e756457d7ff44e970e9b8b50686a76f798ca27",
+        "operational_sqlite": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0000\\selected.sqlite3",
+        "operational_sqlite_bytes": 30253056,
+        "operational_sqlite_sha256": "adc33399ff8580a94cc0acfe7539fe413cfaa32f221f3f94685a72a646129e53"
+      },
+      {
+        "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0004\\selected.jsonl",
+        "selected_jsonl_bytes": 29559665,
+        "selected_jsonl_sha256": "c926770b16796bd48240c699b7af94b6d930bf62e921c51bae95353a38ee7cca",
+        "operational_sqlite": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0004\\selected.sqlite3",
+        "operational_sqlite_bytes": 30609408,
+        "operational_sqlite_sha256": "6c641ca137dab214e9adca31091fa199525e2d362bb645564214afac7cdee2e9"
+      },
+      {
+        "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0008\\selected.jsonl",
+        "selected_jsonl_bytes": 29509197,
+        "selected_jsonl_sha256": "18e7ace2bb30455547de319c585746b800b0331da4b341a907dbcc034f83af40",
+        "operational_sqlite": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0008\\selected.sqlite3",
+        "operational_sqlite_bytes": 30560256,
+        "operational_sqlite_sha256": "5b7741753217beea11afa91877f2aa40cd0df4974c97734ba5c9d98ef74acbeb"
+      },
+      {
+        "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0012\\selected.jsonl",
+        "selected_jsonl_bytes": 29625643,
+        "selected_jsonl_sha256": "1d564d565d2a606a6516917febd4b7af815820ec4a60db0f8758e1d250ac43f6",
+        "operational_sqlite": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0012\\selected.sqlite3",
+        "operational_sqlite_bytes": 30445568,
+        "operational_sqlite_sha256": "9e884d917ef579f77d23a5b36ec085a3728f006f78a0835f268d8d1fe7a034e8"
+      },
+      {
+        "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0016\\selected.jsonl",
+        "selected_jsonl_bytes": 29797529,
+        "selected_jsonl_sha256": "d041da3acaf6916ade22699494d03ec457f982e534ddf779e08fbd5b48332a06",
+        "operational_sqlite": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0016\\selected.sqlite3",
+        "operational_sqlite_bytes": 30793728,
+        "operational_sqlite_sha256": "386defd55702e275e30d76065c6751ac8099965720819ec523558ed522911723"
+      }
+    ],
+    "new_candidate_inputs": [
+      {
+        "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0001\\selected.jsonl",
+        "selected_jsonl_bytes": 185026164,
+        "selected_jsonl_sha256": "955f464a718b57a04ee323aa88fa0a0c2da6ca32104b025139e6da73e0eca2e7",
+        "operational_sqlite": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0001\\selected.sqlite3",
+        "operational_sqlite_bytes": 190099456,
+        "operational_sqlite_sha256": "018720a630f4dab6363b70ea4d635a16874ae2b227cbb28e9b203742d3368f8d"
+      },
+      {
+        "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0005\\selected.jsonl",
+        "selected_jsonl_bytes": 185480126,
+        "selected_jsonl_sha256": "2eea9d3f2a64cae1e7d2c89697357d6d2c432609b92f043f9465e3244ca1828a",
+        "operational_sqlite": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0005\\selected.sqlite3",
+        "operational_sqlite_bytes": 190971904,
+        "operational_sqlite_sha256": "0bb2add9e85098007ab6e730b41c91e504fb9ea2da9944f43996edeb65c355dd"
+      },
+      {
+        "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0009\\selected.jsonl",
+        "selected_jsonl_bytes": 184372932,
+        "selected_jsonl_sha256": "fda98704f1d19695d7177ff960a8b4532792de283dd995db0f37bd6050e5ecab",
+        "operational_sqlite": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0009\\selected.sqlite3",
+        "operational_sqlite_bytes": 187498496,
+        "operational_sqlite_sha256": "7814a6e45065fac7afaef91348a1c8a9f66cb3a3daed3444c3bd6320c447a39f"
+      }
+    ]
+  },
+  "selection": {
+    "deduplication_key": "exact FEN string",
+    "quality_order": "greatest depth, then greatest knodes; earlier input wins exact ties",
+    "old_exclusion_unique_fens": 800000,
+    "old_merge": [
+      {
+        "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0000\\selected.sqlite3",
+        "rows": 160000,
+        "new_unique_old_fens": 160000,
+        "duplicates_with_earlier_old_inputs": 0
+      },
+      {
+        "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0004\\selected.sqlite3",
+        "rows": 160000,
+        "new_unique_old_fens": 160000,
+        "duplicates_with_earlier_old_inputs": 0
+      },
+      {
+        "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0008\\selected.sqlite3",
+        "rows": 160000,
+        "new_unique_old_fens": 160000,
+        "duplicates_with_earlier_old_inputs": 0
+      },
+      {
+        "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0012\\selected.sqlite3",
+        "rows": 160000,
+        "new_unique_old_fens": 160000,
+        "duplicates_with_earlier_old_inputs": 0
+      },
+      {
+        "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\shard0016\\selected.sqlite3",
+        "rows": 160000,
+        "new_unique_old_fens": 160000,
+        "duplicates_with_earlier_old_inputs": 0
+      }
+    ],
+    "new_merge": [
+      {
+        "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0001\\selected.sqlite3",
+        "source_name": "shard0001",
+        "rows": 1000000,
+        "mate_rows_excluded": 135335,
+        "missing_cp_rows_excluded": 0,
+        "eligible_cp_rows": 864665,
+        "old_fen_overlap_excluded": 0,
+        "duplicates_with_earlier_new_inputs": 0,
+        "higher_quality_cross_input_updates": 0,
+        "new_unique_positions_added": 864665,
+        "final_quality_order_violations": 0
+      },
+      {
+        "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0005\\selected.sqlite3",
+        "source_name": "shard0005",
+        "rows": 1000000,
+        "mate_rows_excluded": 114448,
+        "missing_cp_rows_excluded": 0,
+        "eligible_cp_rows": 885552,
+        "old_fen_overlap_excluded": 0,
+        "duplicates_with_earlier_new_inputs": 0,
+        "higher_quality_cross_input_updates": 0,
+        "new_unique_positions_added": 885552,
+        "final_quality_order_violations": 0
+      },
+      {
+        "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0009\\selected.sqlite3",
+        "source_name": "shard0009",
+        "rows": 1000000,
+        "mate_rows_excluded": 122970,
+        "missing_cp_rows_excluded": 0,
+        "eligible_cp_rows": 877030,
+        "old_fen_overlap_excluded": 0,
+        "duplicates_with_earlier_new_inputs": 0,
+        "higher_quality_cross_input_updates": 0,
+        "new_unique_positions_added": 877030,
+        "final_quality_order_violations": 0
+      }
+    ],
+    "feature_domain_validation": {
+      "raw_deduplicated_positions": 2627247,
+      "valid_positions": 2626776,
+      "invalid_positions_excluded": 471,
+      "reasons": {
+        "more_than_32_pieces": 471
+      },
+      "policy": "preserved in external rejection ledger with valid=0; absent from every split"
+    },
+    "mate_policy": "excluded",
+    "missing_cp_policy": "excluded"
+  },
+  "target": {
+    "source_orientation": "White-relative cp",
+    "runtime_orientation": "side-to-move relative",
+    "formula": "clip(cp,-2000,2000) for White to move; negate after clipping for Black to move",
+    "clip_cp": 2000,
+    "orientation_proof": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\manifests\\orientation_verification.json",
+    "orientation_proof_sha256": "bcdabafef866213690b6c33136b933a784a0b0367b38faae1f664f2de3720b29"
+  },
+  "features": {
+    "vocabulary_rows": 768,
+    "perspectives": [
+      "fixed White",
+      "fixed Black"
+    ],
+    "shape": [
+      2,
+      32
+    ],
+    "dtype": "uint16",
+    "padding_row": 768,
+    "black_square_orientation": "rank flip: square xor 56",
+    "relative_colour": "absolute colour xor perspective",
+    "manual_encoder_check": {
+      "checked": 10000,
+      "mismatches": 0,
+      "reference": "production.features.encode_board"
+    }
+  },
+  "split": {
+    "algorithm": "BLAKE2b-64 keyed hash of exact FEN, little-endian integer mod 10000",
+    "seed": 20260910,
+    "buckets": {
+      "pristine": "0..199 (2.0%)",
+      "validation": "200..349 (1.5%)",
+      "development": "350..499 (1.5%)",
+      "train": "500..9999 (95.0%)"
+    },
+    "membership_fen_sha256": {
+      "pristine": "8e3c549ed75e4d8f2ac853ba62a311e362c379a5c66d4e6e2979c460eae508bc",
+      "validation": "28dd3db632611a1bb32abbca176c5011ae907eab0f178d7efaf6f4f3b4bfee20",
+      "development": "4f58691b1e9fbacb7ad84ab1dee4f2c1a7aaa88d4d6189e2abbad537c2139270",
+      "train": "697f8668aa5033aa2ef2b26c8d51aee404ba00a8c1689e9988c9c71ff5ccdf96"
+    },
+    "output_order": "lexicographic exact FEN"
+  },
+  "split_counts": {
+    "pristine": 52584,
+    "validation": 39790,
+    "development": 39335,
+    "train": 2495067
+  },
+  "old_training_component": {
+    "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\converted_baseline_train_500k.npz",
+    "bytes": 65500756,
+    "sha256": "9e770097b186c6b0ddd198bb41a78a75349df39103ce9ceb014932aad758caa5",
+    "rows": 500000,
+    "source_path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz",
+    "source_bytes": 65500756,
+    "source_sha256": "4a99714db848c23308510f075af2b93c51a5d02a4c8574f478693ffe1b282ba2",
+    "conversion": "active bucketed row modulo 768; padding row 6144 maps to 768",
+    "active_feature_entries": 22328156,
+    "padding_entries": 9671844,
+    "quiet_count": 400000,
+    "general_nonquiet_count": 100000,
+    "composition_provenance": "existing final_mixed v0 manifest"
+  },
+  "datasets": {
+    "train": {
+      "count": 2495067,
+      "white_to_move": 1262619,
+      "black_to_move": 1232448,
+      "clipped_targets": 40792,
+      "target_min_cp": -2000,
+      "target_max_cp": 2000,
+      "target_mean_cp": 20.24435576279114,
+      "npz_files": [
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_000.npz",
+          "bytes": 32750756,
+          "sha256": "c7cd30ca4d1641c6cbc6a4c770f943b6a95e30dcb4434f88a1ee98db999d9029",
+          "rows": 250000
+        },
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_001.npz",
+          "bytes": 32750756,
+          "sha256": "3534245dd229531b9b51b82087a8146caab9287964b641962bf3e073664475ce",
+          "rows": 250000
+        },
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_002.npz",
+          "bytes": 32750756,
+          "sha256": "385d47ef298ca54e2299c95e6487635d45ca726f781165628919458bdd385d5f",
+          "rows": 250000
+        },
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_003.npz",
+          "bytes": 32750756,
+          "sha256": "451a0b0bac093eb966f7f865870080d7e6332ed4fc9517e12bf777ec35565061",
+          "rows": 250000
+        },
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_004.npz",
+          "bytes": 32750756,
+          "sha256": "33a86d045ca78945afc8ed4e6730a7fb9ecef35bb5713d7d5897563e4913e355",
+          "rows": 250000
+        },
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_005.npz",
+          "bytes": 32750756,
+          "sha256": "84118d92b6098e44b9f2deca1db577eae5e8c12d153964cdcb0f9c6939f91b33",
+          "rows": 250000
+        },
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_006.npz",
+          "bytes": 32750756,
+          "sha256": "cc7ec2023b15985bb7e01bd0e83d5de03bfdf1a7d7c613027279a65b4a83f71b",
+          "rows": 250000
+        },
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_007.npz",
+          "bytes": 32750756,
+          "sha256": "61e973a47941077567346479e2790f41ba2478f64263ecbab42bd1b9770ab91d",
+          "rows": 250000
+        },
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_008.npz",
+          "bytes": 32750756,
+          "sha256": "2da63e7c87c27a2a41a68b24e896c3774b3035a6027b863858289f00168a7684",
+          "rows": 250000
+        },
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\train_009.npz",
+          "bytes": 32104533,
+          "sha256": "5be31224101a6a3f03b571b4742a31d7e73bd8a0827753d4d4162d90c4011c1b",
+          "rows": 245067
+        }
+      ],
+      "ordering": "lexicographic exact FEN"
+    },
+    "validation": {
+      "count": 39790,
+      "white_to_move": 20067,
+      "black_to_move": 19723,
+      "clipped_targets": 657,
+      "target_min_cp": -2000,
+      "target_max_cp": 2000,
+      "target_mean_cp": 18.527670268911788,
+      "npz_files": [
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\validation.npz",
+          "bytes": 5213246,
+          "sha256": "99ae9921a628715d31cbf718241d2aa75eba09550a39548a9379c768aec9d568",
+          "rows": 39790
+        }
+      ],
+      "ordering": "lexicographic exact FEN",
+      "fens": {
+        "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\validation_fens.jsonl.gz",
+        "bytes": 1404465,
+        "sha256": "e28310dded1748f2e3f1c2dde7b274bafe5a6ab7d62e2008a68b270e745235d6",
+        "contains_teacher_targets": false
+      }
+    },
+    "development": {
+      "count": 39335,
+      "white_to_move": 20013,
+      "black_to_move": 19322,
+      "clipped_targets": 692,
+      "target_min_cp": -2000,
+      "target_max_cp": 2000,
+      "target_mean_cp": 14.786449726706495,
+      "npz_files": [
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\development.npz",
+          "bytes": 5153641,
+          "sha256": "a37e22a57685de44bb9098611da4d2c3fd4a0796e13fe908bbcab6263036b9e7",
+          "rows": 39335
+        }
+      ],
+      "ordering": "lexicographic exact FEN",
+      "fens": {
+        "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\development_fens.jsonl.gz",
+        "bytes": 1389621,
+        "sha256": "49eecebdd8dad23e3c55bb13870a39fd481938e78810f415e6caad9b6b7a8a57",
+        "contains_teacher_targets": false
+      }
+    },
+    "pristine": {
+      "count": 52584,
+      "npz_files": [
+        {
+          "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\pristine.npz",
+          "bytes": 6889260,
+          "sha256": "4defa4326c4eadfb5c05fa4ce1022de14485238f7510192624f5c98bab48fa8f",
+          "rows": 52584
+        }
+      ],
+      "ordering": "lexicographic exact FEN",
+      "fens": {
+        "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\pristine_fens.jsonl.gz",
+        "bytes": 1840151,
+        "sha256": "9b5fe6212461794bb287da4737997ccaeb27ba7b6d16f17c742e5c5160b738cd",
+        "contains_teacher_targets": false
+      },
+      "seal": "count and cryptographic hashes only; no target distribution or model metric computed"
+    }
+  },
+  "database": {
+    "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\frozen_positions.sqlite3",
+    "bytes": 447520768,
+    "sha256": "18dc29f2515819abb435b4a538a2cbc9091c3c0375b6b43635320b43f0319ab1",
+    "integrity_check": "ok",
+    "role": "canonical ledger of excluded old FENs and deduplicated new FENs"
+  },
+  "baseline_preprocess_manifest": {
+    "path": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\manifests\\preprocess.json",
+    "sha256": "3497a4d30814fab7723441885892f079e84162144cc6f5a94cdf26cd21198cb2"
+  },
+  "training_shuffle_seed_reserved": 20260911,
+  "elapsed_seconds": 837.391304000048
+}

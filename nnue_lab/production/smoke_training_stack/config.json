@@ -1,0 +1,43 @@
+{
+  "config": {
+    "command": "'C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\train.py' --train-data 'C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz' --validation-data 'C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\validation.npz' --run-dir 'nnue_lab\\production\\smoke_training_stack' --width 256 --epochs 2 --batch-size 512 --validation-batch-size 512 --threads 2 --seed 20260910 --patience 2 --maximum-train-examples 4096 --maximum-validation-examples 1024 --legacy-chessbuckets-mod768 --stage-name smoke --resume",
+    "stage_name": "smoke",
+    "width": 256,
+    "seed": 20260910,
+    "epochs_requested": 2,
+    "batch_size": 512,
+    "validation_batch_size": 512,
+    "learning_rate": 0.001,
+    "weight_decay": 1e-05,
+    "lr_milestones": [],
+    "lr_gamma": 0.3,
+    "patience": 2,
+    "minimum_delta": 1e-07,
+    "threads": 2,
+    "legacy_chessbuckets_mod768": true,
+    "maximum_train_examples": 4096,
+    "maximum_validation_examples": 1024
+  },
+  "data": {
+    "train": [
+      {
+        "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\final_mixed.npz",
+        "sha256": "4a99714db848c23308510f075af2b93c51a5d02a4c8574f478693ffe1b282ba2",
+        "bytes": 65500756,
+        "examples": 500000,
+        "legacy_chessbuckets_mod768": true
+      }
+    ],
+    "validation": [
+      {
+        "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\validation.npz",
+        "sha256": "32afa1006db83a9c0f818a3ca9a04aa2ea1aa628193947eabc8313e2411490be",
+        "bytes": 2286706,
+        "examples": 17450,
+        "legacy_chessbuckets_mod768": true
+      }
+    ],
+    "train_examples_per_epoch": 4096,
+    "validation_examples": 1024
+  }
+}

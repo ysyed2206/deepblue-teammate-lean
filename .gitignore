@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.mypy_cache/
+.ruff_cache/
+submission.zip
+*.pgn
+
+# Deep Blue local artefacts
+submission.zip
+*.pgn
+logs/
+
+# Large/derived NNUE artefacts -- not needed for CI, keep pushes lean
+.numba_cache/
+nnue_lab/teammate_pawnstar/finetune/checkpoints/
+nnue_lab/production/.numba_cache/
+nnue_lab/production/.mypy_extension_cache/

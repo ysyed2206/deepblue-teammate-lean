@@ -1,0 +1,50 @@
+{
+  "format": "deepblue-perspective-chess768-q1-report-v1",
+  "created_utc": "2026-09-02T14:22:10Z",
+  "q1_contract": "FWq=round(QA*FW), FBq=round(QA*FB), A=clip(FBq+sum(FWq),0,QA), OWq=round(QB*OW), OBq=round(QA*QB*OB), cp=round_symmetric(400*(sum(OWq*A^2)+OBq*QA)/(QB*QA^2))",
+  "qa": 255,
+  "qb": 64,
+  "output_bias_scale": 16320,
+  "evaluation_scale_cp": 400,
+  "width": 256,
+  "deploy_parameter_count": 197377,
+  "checkpoint": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\smoke_training_stack\\best.pt",
+  "checkpoint_sha256": "a27b80bfe7aa3b9035dcd542ebee5fe8263a609e3f870b3dca051dd88b177cff",
+  "quantized_model": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\smoke_training_stack\\candidate_q1.npz",
+  "quantized_model_sha256": "29d69a3881507c61b78cc873407592be059603bf250caaddff21de67c1d9d9a2",
+  "quantized_model_bytes": 422066,
+  "crosscheck_data": [
+    {
+      "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\processed\\validation.npz",
+      "sha256": "32afa1006db83a9c0f818a3ca9a04aa2ea1aa628193947eabc8313e2411490be",
+      "bytes": 2286706,
+      "examples": 17450,
+      "legacy_chessbuckets_mod768": true
+    }
+  ],
+  "crosscheck_count": 1024,
+  "crosscheck_is_pristine": false,
+  "architecture_selection_declared_locked": false,
+  "float_teacher_probability_mse": 0.024180544025955073,
+  "quantized_teacher_probability_mse": 0.0243768882588572,
+  "float_teacher_mae_cp": 198.45537398004672,
+  "quantized_teacher_mae_cp": 197.322265625,
+  "quantization_absolute_error": {
+    "median_cp": 10.448759078979492,
+    "p95_cp": 17.969953727722167,
+    "p99_cp": 20.94494312286377,
+    "maximum_cp": 27.789215087890625,
+    "mean_cp": 10.651203027402516
+  },
+  "crosscheck_seconds": 0.19414139993023127,
+  "crosscheck_examples_per_second": 5274.506109299694,
+  "integer_ranges": {
+    "feature_weight_min": -7,
+    "feature_weight_max": 7,
+    "feature_bias_min": 62,
+    "feature_bias_max": 66,
+    "output_weight_min": -1,
+    "output_weight_max": 1,
+    "output_bias": 22
+  }
+}

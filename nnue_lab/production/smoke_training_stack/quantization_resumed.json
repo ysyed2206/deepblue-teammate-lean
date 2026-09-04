@@ -1,0 +1,50 @@
+{
+  "format": "deepblue-perspective-chess768-q1-report-v1",
+  "created_utc": "2026-09-02T14:42:46Z",
+  "q1_contract": "FWq=round(QA*FW), FBq=round(QA*FB), A=clip(FBq+sum(FWq),0,QA), OWq=round(QB*OW), OBq=round(QA*QB*OB), cp=round_symmetric(400*(sum(OWq*A^2)+OBq*QA)/(QB*QA^2))",
+  "qa": 255,
+  "qb": 64,
+  "output_bias_scale": 16320,
+  "evaluation_scale_cp": 400,
+  "width": 256,
+  "deploy_parameter_count": 197377,
+  "checkpoint": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\smoke_training_stack\\best.pt",
+  "checkpoint_sha256": "34cce4f5cb59eb1e8fef709a35ee75476666fb60fce6fa1d234a25553ddc317a",
+  "quantized_model": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\smoke_training_stack\\candidate_q1_resumed.npz",
+  "quantized_model_sha256": "22ccb53d234eec3f113f85b5f5f44e8c8e9f51fccd12072479888c7b21ca598e",
+  "quantized_model_bytes": 428142,
+  "crosscheck_data": [
+    {
+      "path": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_frozen\\development.npz",
+      "sha256": "a37e22a57685de44bb9098611da4d2c3fd4a0796e13fe908bbcab6263036b9e7",
+      "bytes": 5153641,
+      "examples": 39335,
+      "legacy_chessbuckets_mod768": false
+    }
+  ],
+  "crosscheck_count": 20000,
+  "crosscheck_is_pristine": false,
+  "architecture_selection_declared_locked": false,
+  "float_teacher_probability_mse": 0.04229039519086542,
+  "quantized_teacher_probability_mse": 0.04254233021450115,
+  "float_teacher_mae_cp": 312.8793398181377,
+  "quantized_teacher_mae_cp": 315.0701,
+  "quantization_absolute_error": {
+    "median_cp": 10.213945150375366,
+    "p95_cp": 12.885116052627563,
+    "p99_cp": 14.079922542572012,
+    "maximum_cp": 18.363052368164062,
+    "mean_cp": 10.302667819402647
+  },
+  "crosscheck_seconds": 2.799867399968207,
+  "crosscheck_examples_per_second": 7143.195424264415,
+  "integer_ranges": {
+    "feature_weight_min": -9,
+    "feature_weight_max": 9,
+    "feature_bias_min": 61,
+    "feature_bias_max": 68,
+    "output_weight_min": -1,
+    "output_weight_max": 1,
+    "output_bias": -10
+  }
+}

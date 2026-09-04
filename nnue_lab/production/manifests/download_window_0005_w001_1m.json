@@ -1,0 +1,83 @@
+{
+  "format": "deepblue-nnue-data-row-group-window-v1",
+  "created_utc": "2026-09-02T19:55:29Z",
+  "source": "https://huggingface.co/datasets/Lichess/chess-position-evaluations",
+  "source_revision": "abb8f0b1251f89295a35b5ac801cb08a873812de",
+  "license": "CC0-1.0",
+  "source_file": "https://huggingface.co/datasets/Lichess/chess-position-evaluations/resolve/abb8f0b1251f89295a35b5ac801cb08a873812de/data/data_0005.parquet?download=true",
+  "remote_file_bytes": 2114265994,
+  "source_etag": "\"e912deab4e6c469db1ec00e5623e67e6e6517a57f3568807ae8fcf6284d32eb8\"",
+  "source_last_modified": null,
+  "downloaded_bytes": 142943114,
+  "http_range_requests": 18,
+  "download_cap_bytes": 900000000,
+  "prior_manifest": {
+    "path": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\manifests\\download_0005.json",
+    "sha256": "2e1227bb32f4f57f6b1904018b5455e3a07944ecd546efb5cb5654ca517231ff"
+  },
+  "prior_end_exclusive": 2823428,
+  "skipped_rows_before_window": 322300,
+  "parquet_total_rows": 50327218,
+  "parquet_total_row_groups": 48,
+  "row_group_layout_sha256": "6de242b932fd65192638d07b4d299a82682b0075c3bda9f4986329ac12b00a3d",
+  "requested_row_group_intervals": [
+    {
+      "index": 3,
+      "start_inclusive": 3145728,
+      "end_exclusive": 4194304
+    },
+    {
+      "index": 4,
+      "start_inclusive": 4194304,
+      "end_exclusive": 5242880
+    },
+    {
+      "index": 5,
+      "start_inclusive": 5242880,
+      "end_exclusive": 6291456
+    }
+  ],
+  "raw_rows_scanned": 2864318,
+  "unique_fens": 1000000,
+  "reappearing_fen_groups": 0,
+  "discarded_incomplete_boundary_groups": 1,
+  "discarded_first_fen_rows": 1,
+  "source_row_interval": {
+    "start_inclusive": 3145728,
+    "end_exclusive": 6010046
+  },
+  "boundary_lookahead_row": 6010046,
+  "parquet_row_groups_requested": [
+    3,
+    4,
+    5
+  ],
+  "stopped_at_complete_fen_boundary": true,
+  "ordering_audit": {
+    "multipv_groups_checked": 570663,
+    "white_groups": 289449,
+    "black_groups": 281214,
+    "first_is_stm_best_count": 570429,
+    "first_is_stm_best_rate": 0.999589950636365,
+    "fully_monotonic_count": 569924,
+    "fully_monotonic_rate": 0.9987050150439051
+  },
+  "requested_unique_fens": 1000000,
+  "selection": "max(depth, then knodes), first row within complete analysis/MultiPV group",
+  "prior_fen_overlap_checks": [
+    {
+      "manifest": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\manifests\\download_0005.json",
+      "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_v1\\shard0005\\selected.sqlite3",
+      "overlapping_fens": 0
+    }
+  ],
+  "selected_jsonl": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_windows\\shard0005_window001_1m\\selected.jsonl",
+  "selected_jsonl_bytes": 185670966,
+  "selected_jsonl_sha256": "42878604323e006ef72371ccf94fa31e05166a103469528ce6fcef6c9aa9237b",
+  "database": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\production_windows\\shard0005_window001_1m\\selected.sqlite3",
+  "database_bytes": 190783488,
+  "database_sha256": "67e6a4a9ca1feab5c0f581750c81a557f8a9dbc7ca6b4aad55712b2f67b4038a",
+  "database_integrity_check": "ok",
+  "elapsed_seconds": 525.8883630000055,
+  "rows_per_second": 5446.62746226231
+}

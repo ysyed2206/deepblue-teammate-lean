@@ -1,0 +1,149 @@
+{
+  "format": "deepblue-perspective-chess768-runtime-benchmark-v2",
+  "hce_semantics": "alternating side-to-move prevents invariant-call hoisting",
+  "iterations_per_trial": 20000,
+  "measurements": {
+    "capture_update": {
+      "checksum": 330000,
+      "maximum_ns": 260.905,
+      "median_ns": 245.545,
+      "minimum_ns": 217.575,
+      "p10_ns": 226.76399999999998,
+      "p90_ns": 259.35999999999996,
+      "trials": 7
+    },
+    "capture_update_plus_tail": {
+      "checksum": 20000,
+      "maximum_ns": 1762.71,
+      "median_ns": 1652.145,
+      "minimum_ns": 1597.925,
+      "p10_ns": 1608.944,
+      "p90_ns": 1761.309,
+      "trials": 7
+    },
+    "castle_update": {
+      "checksum": 470000,
+      "maximum_ns": 759.24,
+      "median_ns": 691.815,
+      "minimum_ns": 542.645,
+      "p10_ns": 554.6659999999999,
+      "p90_ns": 727.551,
+      "trials": 7
+    },
+    "castle_update_plus_tail": {
+      "checksum": -60000,
+      "maximum_ns": 2430.975,
+      "median_ns": 2137.45,
+      "minimum_ns": 2065.565,
+      "p10_ns": 2095.826,
+      "p90_ns": 2308.0080000000003,
+      "trials": 7
+    },
+    "double_pawn_push": {
+      "checksum": 770000,
+      "maximum_ns": 174.81,
+      "median_ns": 123.94,
+      "minimum_ns": 120.09,
+      "p10_ns": 120.819,
+      "p90_ns": 166.21800000000002,
+      "trials": 7
+    },
+    "double_pawn_push_plus_tail": {
+      "checksum": -670000,
+      "maximum_ns": 1731.19,
+      "median_ns": 1655.96,
+      "minimum_ns": 1428.095,
+      "p10_ns": 1454.069,
+      "p90_ns": 1727.875,
+      "trials": 7
+    },
+    "full_refresh": {
+      "checksum": 62000,
+      "maximum_ns": 4247.2,
+      "median_ns": 3724.9,
+      "minimum_ns": 3067.95,
+      "p10_ns": 3234.51,
+      "p90_ns": 4226.65,
+      "trials": 7
+    },
+    "hce_evaluation": {
+      "checksum": 240000,
+      "maximum_ns": 165.435,
+      "median_ns": 100.635,
+      "minimum_ns": 82.675,
+      "p10_ns": 83.182,
+      "p90_ns": 158.655,
+      "trials": 7
+    },
+    "king_update": {
+      "checksum": 300000,
+      "maximum_ns": 184.96,
+      "median_ns": 155.64,
+      "minimum_ns": 121.465,
+      "p10_ns": 121.846,
+      "p90_ns": 181.036,
+      "trials": 7
+    },
+    "king_update_plus_tail": {
+      "checksum": 40000,
+      "maximum_ns": 1691.26,
+      "median_ns": 1681.165,
+      "minimum_ns": 1354.575,
+      "p10_ns": 1406.151,
+      "p90_ns": 1686.586,
+      "trials": 7
+    },
+    "promotion_update": {
+      "checksum": 360000,
+      "maximum_ns": 204.32,
+      "median_ns": 143.19,
+      "minimum_ns": 140.37,
+      "p10_ns": 140.505,
+      "p90_ns": 170.615,
+      "trials": 7
+    },
+    "promotion_update_plus_tail": {
+      "checksum": 10000,
+      "maximum_ns": 1563.05,
+      "median_ns": 1466.065,
+      "minimum_ns": 1388.09,
+      "p10_ns": 1412.468,
+      "p90_ns": 1530.317,
+      "trials": 7
+    },
+    "quiet_update": {
+      "checksum": 620000,
+      "maximum_ns": 219.35,
+      "median_ns": 182.03,
+      "minimum_ns": 124.09,
+      "p10_ns": 126.184,
+      "p90_ns": 212.951,
+      "trials": 7
+    },
+    "quiet_update_plus_tail": {
+      "checksum": -660000,
+      "maximum_ns": 1870.6,
+      "median_ns": 1440.88,
+      "minimum_ns": 1387.0,
+      "p10_ns": 1389.136,
+      "p90_ns": 1648.0480000000002,
+      "trials": 7
+    },
+    "tail_only": {
+      "checksum": -740000,
+      "maximum_ns": 1488.775,
+      "median_ns": 1383.095,
+      "minimum_ns": 1276.025,
+      "p10_ns": 1285.691,
+      "p90_ns": 1463.065,
+      "trials": 7
+    }
+  },
+  "model_kind": "synthetic",
+  "model_path": null,
+  "side_to_move_fixture": 0,
+  "timing": "actual elapsed perf_counter_ns; JIT warm-up excluded",
+  "trials": 7,
+  "update_semantics": "alternating exact make/unmake deltas; each operation is one transition",
+  "width": 256
+}

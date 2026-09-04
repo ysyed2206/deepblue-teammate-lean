@@ -1,0 +1,426 @@
+{
+  "format": "deepblue-nnue-orientation-proof-v0",
+  "created_utc": "2026-09-01T04:09:03Z",
+  "conclusion": "white-relative",
+  "method": "balanced high-|cp| non-mate sample; current Stockfish re-analysis; compare raw dataset sign/correlation against White POV and side-to-move POV",
+  "official_schema_support": "https://raw.githubusercontent.com/lichess-org/api/master/doc/specs/schemas/CloudEval.yaml",
+  "stockfish_path_external_not_shipped": "C:\\Users\\mohib\\AppData\\Local\\Temp\\deepblue-nnue-data\\stockfish18\\unpacked\\stockfish\\stockfish-windows-x86-64-avx2.exe",
+  "stockfish_id": {
+    "name": "Stockfish 18",
+    "author": "the Stockfish developers (see AUTHORS file)"
+  },
+  "analysis_depth": 16,
+  "positions_requested": 40,
+  "positions_scored_nonmate": 40,
+  "white_to_move": 20,
+  "black_to_move": 20,
+  "decisive_for_sign_test": 40,
+  "sign_floor_cp": 80,
+  "white_relative_sign_agreement": 1.0,
+  "stm_relative_sign_agreement": 0.5,
+  "white_relative_pearson_correlation": 0.9688531412080588,
+  "stm_relative_pearson_correlation": -0.031418771280249495,
+  "elapsed_seconds": 13.49778699997114,
+  "evidence": [
+    {
+      "fen": "3r4/R4pk1/1p3pp1/1Q1p4/3P4/1PP2Pp1/5qP1/5N1K w - -",
+      "dataset_cp": -1276,
+      "dataset_depth": 24,
+      "dataset_knodes": 11276,
+      "stockfish_white_cp": -562,
+      "stockfish_stm_cp": -562,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 73947
+    },
+    {
+      "fen": "k4b1r/p3pppp/B1p5/3nB1N1/2P4q/8/PP3P2/3R1RK1 w - -",
+      "dataset_cp": 449,
+      "dataset_depth": 17,
+      "dataset_knodes": 4118,
+      "stockfish_white_cp": 347,
+      "stockfish_stm_cp": 347,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 169461
+    },
+    {
+      "fen": "2r2r1k/1pN1Qpbp/p4pp1/qb6/8/1B6/PP3PPP/2RR2K1 w - -",
+      "dataset_cp": 425,
+      "dataset_depth": 44,
+      "dataset_knodes": 3805271,
+      "stockfish_white_cp": 218,
+      "stockfish_stm_cp": 218,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 175748
+    },
+    {
+      "fen": "1nr3k1/7p/p2p2p1/3q4/1Ppr4/1B5P/P1Q2PP1/3RR1K1 w - -",
+      "dataset_cp": 310,
+      "dataset_depth": 24,
+      "dataset_knodes": 1556,
+      "stockfish_white_cp": 313,
+      "stockfish_stm_cp": 313,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 200131
+    },
+    {
+      "fen": "6rr/2bnk3/1pp1bp1q/p2pp1N1/P3P2P/2PPR1Q1/1P3PP1/R2B2K1 w - -",
+      "dataset_cp": -489,
+      "dataset_depth": 20,
+      "dataset_knodes": 8553,
+      "stockfish_white_cp": -486,
+      "stockfish_stm_cp": -486,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 92962
+    },
+    {
+      "fen": "4kr2/3qbpR1/6r1/p1p1PbNQ/1pPp4/3P4/PP5K/R7 w - -",
+      "dataset_cp": -630,
+      "dataset_depth": 22,
+      "dataset_knodes": 7682,
+      "stockfish_white_cp": -425,
+      "stockfish_stm_cp": -425,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 19286
+    },
+    {
+      "fen": "r7/5p2/7p/P3kP1P/6K1/R7/8/8 w - -",
+      "dataset_cp": 589,
+      "dataset_depth": 29,
+      "dataset_knodes": 22366,
+      "stockfish_white_cp": 267,
+      "stockfish_stm_cp": 267,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 44133
+    },
+    {
+      "fen": "r5k1/3r4/7p/4Bp2/2pPpPp1/p3n1N1/1P1b2PP/RR4K1 w - -",
+      "dataset_cp": -345,
+      "dataset_depth": 26,
+      "dataset_knodes": 116032,
+      "stockfish_white_cp": -288,
+      "stockfish_stm_cp": -288,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 124062
+    },
+    {
+      "fen": "5rk1/1p2q2p/1Q3np1/8/P7/2N3PP/1P3P2/3R2K1 w - -",
+      "dataset_cp": 388,
+      "dataset_depth": 20,
+      "dataset_knodes": 3422,
+      "stockfish_white_cp": 408,
+      "stockfish_stm_cp": 408,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 98103
+    },
+    {
+      "fen": "5rk1/ppp4p/3p1Qp1/8/2PRq3/4bbP1/PP5P/5R1K w - -",
+      "dataset_cp": -651,
+      "dataset_depth": 20,
+      "dataset_knodes": 16495,
+      "stockfish_white_cp": -535,
+      "stockfish_stm_cp": -535,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 71200
+    },
+    {
+      "fen": "rnb2r1k/pp3ppB/4p3/3pP3/1q4P1/5N2/PP3P1P/RQ2K2R w KQ -",
+      "dataset_cp": -317,
+      "dataset_depth": 22,
+      "dataset_knodes": 53141,
+      "stockfish_white_cp": -243,
+      "stockfish_stm_cp": -243,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 170454
+    },
+    {
+      "fen": "5rr1/1p4k1/p3Rp2/2Pp1p1R/3P1P2/2P5/P1b1B1PP/6K1 w - -",
+      "dataset_cp": 579,
+      "dataset_depth": 22,
+      "dataset_knodes": 13916,
+      "stockfish_white_cp": 481,
+      "stockfish_stm_cp": 481,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 46858
+    },
+    {
+      "fen": "8/8/7R/2K1k3/2P5/8/8/2r5 w - -",
+      "dataset_cp": 506,
+      "dataset_depth": 42,
+      "dataset_knodes": 3118,
+      "stockfish_white_cp": 443,
+      "stockfish_stm_cp": 443,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 160183
+    },
+    {
+      "fen": "1nr1rnk1/2q2ppp/4p3/p3N1P1/1pNP1P2/7R/PP2QKP1/7R w - -",
+      "dataset_cp": 404,
+      "dataset_depth": 20,
+      "dataset_knodes": 21588,
+      "stockfish_white_cp": 287,
+      "stockfish_stm_cp": 287,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 49748
+    },
+    {
+      "fen": "8/3b4/p2p4/1k6/1bN4p/p6P/K1Q3P1/8 w - -",
+      "dataset_cp": 567,
+      "dataset_depth": 20,
+      "dataset_knodes": 1811,
+      "stockfish_white_cp": 559,
+      "stockfish_stm_cp": 559,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 68007
+    },
+    {
+      "fen": "8/3P2k1/p6p/1p3Bp1/3r2P1/7P/PP6/6K1 w - -",
+      "dataset_cp": -316,
+      "dataset_depth": 21,
+      "dataset_knodes": 2175,
+      "stockfish_white_cp": -300,
+      "stockfish_stm_cp": -300,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 60794
+    },
+    {
+      "fen": "3r1k2/2R1Npp1/pq1p3p/1p1Pp3/1P2P3/P5PP/2Q2PK1/8 w - -",
+      "dataset_cp": 760,
+      "dataset_depth": 17,
+      "dataset_knodes": 11433,
+      "stockfish_white_cp": 562,
+      "stockfish_stm_cp": 562,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 32756
+    },
+    {
+      "fen": "r7/2pn2k1/1p1p3p/pP1P1ppB/P1P5/5p1P/5PP1/4R1K1 w - -",
+      "dataset_cp": 476,
+      "dataset_depth": 23,
+      "dataset_knodes": 1426,
+      "stockfish_white_cp": 391,
+      "stockfish_stm_cp": 391,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 70383
+    },
+    {
+      "fen": "8/p4kp1/1p1r1r2/6R1/1P6/P5R1/6NK/8 w - -",
+      "dataset_cp": 350,
+      "dataset_depth": 25,
+      "dataset_knodes": 48049,
+      "stockfish_white_cp": 306,
+      "stockfish_stm_cp": 306,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 187780
+    },
+    {
+      "fen": "2r5/p2b3p/3k4/1p1BR3/2p5/P1K3P1/1P5P/4R3 w - -",
+      "dataset_cp": 810,
+      "dataset_depth": 22,
+      "dataset_knodes": 28708,
+      "stockfish_white_cp": 624,
+      "stockfish_stm_cp": 624,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 64328
+    },
+    {
+      "fen": "4Rrk1/p2q4/3p3p/1PpP4/Q2b1pP1/R2P3P/5N2/6K1 b - -",
+      "dataset_cp": -929,
+      "dataset_depth": 19,
+      "dataset_knodes": 7353,
+      "stockfish_white_cp": -574,
+      "stockfish_stm_cp": 574,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 304715
+    },
+    {
+      "fen": "8/p1r2ppp/4p3/4k3/bP6/P6P/5PP1/4R1K1 b - -",
+      "dataset_cp": -533,
+      "dataset_depth": 24,
+      "dataset_knodes": 2732,
+      "stockfish_white_cp": -490,
+      "stockfish_stm_cp": 490,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 139535
+    },
+    {
+      "fen": "r2qk2r/3nbppp/p2pbn2/1B2p3/4P3/1NN1BP2/PPPQ2PP/2KR3R b kq -",
+      "dataset_cp": -366,
+      "dataset_depth": 21,
+      "dataset_knodes": 4357,
+      "stockfish_white_cp": -340,
+      "stockfish_stm_cp": 340,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 92412
+    },
+    {
+      "fen": "8/1p4p1/2p2pk1/P1R5/3q4/4B1P1/2P2K2/8 b - -",
+      "dataset_cp": -425,
+      "dataset_depth": 28,
+      "dataset_knodes": 17506,
+      "stockfish_white_cp": -389,
+      "stockfish_stm_cp": 389,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 73419
+    },
+    {
+      "fen": "4r3/5pkp/1p1n4/p1pP4/P1PbP1RP/2NB4/1P4b1/1K5R b - -",
+      "dataset_cp": 566,
+      "dataset_depth": 20,
+      "dataset_knodes": 1724,
+      "stockfish_white_cp": 585,
+      "stockfish_stm_cp": -585,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 39572
+    },
+    {
+      "fen": "2R3k1/6p1/p2N1p1p/8/P2P4/1P4P1/3rnP1P/5K2 b - -",
+      "dataset_cp": 547,
+      "dataset_depth": 25,
+      "dataset_knodes": 9928,
+      "stockfish_white_cp": 512,
+      "stockfish_stm_cp": -512,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 244174
+    },
+    {
+      "fen": "8/7p/2p3pk/8/2PK4/R5PP/P5r1/8 b - -",
+      "dataset_cp": 476,
+      "dataset_depth": 21,
+      "dataset_knodes": 18376,
+      "stockfish_white_cp": 330,
+      "stockfish_stm_cp": -330,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 80685
+    },
+    {
+      "fen": "r1br2k1/ppp2ppn/3b4/3Np3/1nB5/3P1P2/PPP1N1PP/2KR3R b - -",
+      "dataset_cp": -426,
+      "dataset_depth": 25,
+      "dataset_knodes": 55460,
+      "stockfish_white_cp": -412,
+      "stockfish_stm_cp": 412,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 132568
+    },
+    {
+      "fen": "8/1R6/8/5K2/1k6/r3P3/8/8 b - -",
+      "dataset_cp": 533,
+      "dataset_depth": 34,
+      "dataset_knodes": 11199,
+      "stockfish_white_cp": 383,
+      "stockfish_stm_cp": -383,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 316038
+    },
+    {
+      "fen": "8/8/3k3p/p2Rp2P/p3K3/1r4P1/1P2B3/8 b - -",
+      "dataset_cp": 521,
+      "dataset_depth": 26,
+      "dataset_knodes": 10130,
+      "stockfish_white_cp": 428,
+      "stockfish_stm_cp": -428,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 42815
+    },
+    {
+      "fen": "r1b2rk1/2p2pbp/p1pp1np1/8/3N1P2/1P1Pq3/PBP3PP/RN2QR1K b - -",
+      "dataset_cp": -372,
+      "dataset_depth": 30,
+      "dataset_knodes": 45617,
+      "stockfish_white_cp": -364,
+      "stockfish_stm_cp": 364,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 66212
+    },
+    {
+      "fen": "6r1/ppBQ1ppk/2p3qp/8/8/P1P5/2P2PPP/2R1R1K1 b - -",
+      "dataset_cp": 770,
+      "dataset_depth": 21,
+      "dataset_knodes": 3360,
+      "stockfish_white_cp": 735,
+      "stockfish_stm_cp": -735,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 39740
+    },
+    {
+      "fen": "3rr3/2R1bk1p/1p3pb1/p2p4/3N2Q1/P3P3/1P3PPP/6K1 b - -",
+      "dataset_cp": 544,
+      "dataset_depth": 21,
+      "dataset_knodes": 11620,
+      "stockfish_white_cp": 463,
+      "stockfish_stm_cp": -463,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 70111
+    },
+    {
+      "fen": "8/6P1/4k1Pp/pp2p2P/1r2P3/1P6/3KR3/8 b - -",
+      "dataset_cp": 692,
+      "dataset_depth": 27,
+      "dataset_knodes": 102897,
+      "stockfish_white_cp": 354,
+      "stockfish_stm_cp": -354,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 62639
+    },
+    {
+      "fen": "8/2p2r1p/2k3pb/1rN2p2/K2P2P1/3RPR1P/8/2B5 b - -",
+      "dataset_cp": 382,
+      "dataset_depth": 18,
+      "dataset_knodes": 8939,
+      "stockfish_white_cp": 299,
+      "stockfish_stm_cp": -299,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 94447
+    },
+    {
+      "fen": "8/4k1rp/p5p1/PP2p3/1KP1p3/8/5PPP/3R4 b - -",
+      "dataset_cp": 689,
+      "dataset_depth": 20,
+      "dataset_knodes": 41043,
+      "stockfish_white_cp": 513,
+      "stockfish_stm_cp": -513,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 82604
+    },
+    {
+      "fen": "8/5N1R/6p1/2p1k3/1r6/8/6PP/6K1 b - -",
+      "dataset_cp": 385,
+      "dataset_depth": 23,
+      "dataset_knodes": 10460,
+      "stockfish_white_cp": 274,
+      "stockfish_stm_cp": -274,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 73587
+    },
+    {
+      "fen": "4rr2/1p1b2k1/p1n3Rp/2P5/3p1p1P/8/PP3PPN/2N1R1K1 b - -",
+      "dataset_cp": -536,
+      "dataset_depth": 23,
+      "dataset_knodes": 60333,
+      "stockfish_white_cp": -538,
+      "stockfish_stm_cp": 538,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 48360
+    },
+    {
+      "fen": "r1b2r1k/pp3Bp1/2p1p2q/3p3Q/8/2N5/PPP2PPP/R3K2R b KQ -",
+      "dataset_cp": 405,
+      "dataset_depth": 24,
+      "dataset_knodes": 58524,
+      "stockfish_white_cp": 389,
+      "stockfish_stm_cp": -389,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 73815
+    },
+    {
+      "fen": "3r2k1/p6p/4b1p1/5p2/2P1p3/1P1r1P2/P3R1PP/2R3K1 b - -",
+      "dataset_cp": -465,
+      "dataset_depth": 23,
+      "dataset_knodes": 15069,
+      "stockfish_white_cp": -451,
+      "stockfish_stm_cp": 451,
+      "stockfish_depth": 16,
+      "stockfish_nodes": 127776
+    }
+  ]
+}

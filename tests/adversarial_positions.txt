@@ -1,0 +1,10 @@
+# Positions where Deep Blue played something suspicious against a human.
+#
+# Format:  <FEN> | <what it played> | <what looks wrong>
+#
+# Mohib: when you play the engine (tools/play.py) and it does something that
+# makes you think "why on earth did it play that", save the position here with
+# the --mark command. Every entry becomes a permanent regression case: we check
+# the move it plays now against a deeper search of the same position.
+#
+# (empty - no adversarial games played yet)

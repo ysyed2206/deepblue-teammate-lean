@@ -1,0 +1,18 @@
+{
+  "format": "deepblue-nnue-production-freeze-validation-v1",
+  "ok": true,
+  "manifest": "C:\\Users\\mohib\\aichessathon-starter\\nnue_lab\\production\\manifests\\data_freeze_manifest.json",
+  "manifest_sha256": "07e39495f247576044822d48f518ee2f749623d2c49b3ba8538a1986540e8d79",
+  "split_rows": {
+    "train": 2495067,
+    "validation": 39790,
+    "development": 39335,
+    "pristine": 52584
+  },
+  "converted_old_rows": 500000,
+  "combined_training_rows": 2995067,
+  "database_integrity_check": "ok",
+  "invalid_rows_preserved_outside_splits": 471,
+  "old_fen_overlap_in_new_ledger": 0,
+  "pristine_check_scope": "file/hash/shape/feature-domain/count only; no target statistic or model metric"
+}
