@@ -1,0 +1,113 @@
+{
+  "format": "deepblue-nnue-training-summary-v0",
+  "created_utc": "2026-09-04T11:29:22Z",
+  "command": "'C:\\Users\\uniqu\\Downloads\\deepblue-teammate-lean\\nnue_lab\\train.py' --train-data 'C:\\Users\\uniqu\\AppData\\Local\\Temp\\deepblue-teammate-data\\scratch_data\\train.npz' --validation-data 'C:\\Users\\uniqu\\AppData\\Local\\Temp\\deepblue-teammate-data\\scratch_data\\validation.npz' --width 128 --epochs 8 --batch-size 1024 --validation-batch-size 2048 --threads 6 --seed 20260904 --patience 3 --checkpoint 'nnue_lab\\teammate_pawnstar\\scratch_train\\checkpoints\\scratch_h128_best.pt' --log 'nnue_lab\\teammate_pawnstar\\scratch_train\\checkpoints\\train.jsonl' --summary 'nnue_lab\\teammate_pawnstar\\scratch_train\\checkpoints\\summary.json'",
+  "seed": 20260904,
+  "width": 128,
+  "parameter_count": 786817,
+  "float_parameter_bytes": 3147268,
+  "expected_quantised_bytes": 1573634,
+  "train_examples": 424253,
+  "validation_examples": 22329,
+  "epochs_requested": 8,
+  "epochs_completed": 8,
+  "best_epoch": 8,
+  "best_validation_probability_mse": 0.007273075051151573,
+  "best_validation_teacher_mae_cp": 114.8399915748578,
+  "training_seconds": 273.0936339998152,
+  "total_wall_seconds": 280.69397759996355,
+  "mean_training_examples_per_second": 12428.05974745752,
+  "checkpoint": "C:\\Users\\uniqu\\Downloads\\deepblue-teammate-lean\\nnue_lab\\teammate_pawnstar\\scratch_train\\checkpoints\\scratch_h128_best.pt",
+  "checkpoint_bytes": 3150145,
+  "log": "C:\\Users\\uniqu\\Downloads\\deepblue-teammate-lean\\nnue_lab\\teammate_pawnstar\\scratch_train\\checkpoints\\train.jsonl",
+  "history": [
+    {
+      "event": "epoch",
+      "epoch": 1,
+      "train_probability_mse": 0.015576003556796886,
+      "validation_probability_mse": 0.011674289713317597,
+      "validation_teacher_mae_cp": 144.1482545120695,
+      "training_seconds": 29.95677709998563,
+      "validation_seconds": 0.8965525000821799,
+      "examples_per_second": 14162.17100337551,
+      "best": true
+    },
+    {
+      "event": "epoch",
+      "epoch": 2,
+      "train_probability_mse": 0.009939930512374236,
+      "validation_probability_mse": 0.009344976778633529,
+      "validation_teacher_mae_cp": 129.7432374938421,
+      "training_seconds": 36.042760299984366,
+      "validation_seconds": 1.1607377000618726,
+      "examples_per_second": 11770.824333900531,
+      "best": true
+    },
+    {
+      "event": "epoch",
+      "epoch": 3,
+      "train_probability_mse": 0.007367643427913403,
+      "validation_probability_mse": 0.00834228333773642,
+      "validation_teacher_mae_cp": 123.71562486004747,
+      "training_seconds": 45.26323099993169,
+      "validation_seconds": 1.393002700060606,
+      "examples_per_second": 9373.01625685184,
+      "best": true
+    },
+    {
+      "event": "epoch",
+      "epoch": 4,
+      "train_probability_mse": 0.005856469029685342,
+      "validation_probability_mse": 0.007784571919435578,
+      "validation_teacher_mae_cp": 118.78501472300596,
+      "training_seconds": 39.85979419993237,
+      "validation_seconds": 0.8934722999110818,
+      "examples_per_second": 10643.632475170178,
+      "best": true
+    },
+    {
+      "event": "epoch",
+      "epoch": 5,
+      "train_probability_mse": 0.004879117720287266,
+      "validation_probability_mse": 0.007499804712274407,
+      "validation_teacher_mae_cp": 117.17699516324063,
+      "training_seconds": 30.534453199943528,
+      "validation_seconds": 0.8161954001989216,
+      "examples_per_second": 13894.239311309646,
+      "best": true
+    },
+    {
+      "event": "epoch",
+      "epoch": 6,
+      "train_probability_mse": 0.004209207744927134,
+      "validation_probability_mse": 0.00729858227394639,
+      "validation_teacher_mae_cp": 115.36662943929419,
+      "training_seconds": 30.649815999902785,
+      "validation_seconds": 0.851976300124079,
+      "examples_per_second": 13841.94280322419,
+      "best": true
+    },
+    {
+      "event": "epoch",
+      "epoch": 7,
+      "train_probability_mse": 0.003703684397261823,
+      "validation_probability_mse": 0.007281398711063479,
+      "validation_teacher_mae_cp": 115.07642597630884,
+      "training_seconds": 30.332917100051418,
+      "validation_seconds": 0.7664381000213325,
+      "examples_per_second": 13986.554560533212,
+      "best": true
+    },
+    {
+      "event": "epoch",
+      "epoch": 8,
+      "train_probability_mse": 0.003326623087384424,
+      "validation_probability_mse": 0.007273075051151573,
+      "validation_teacher_mae_cp": 114.8399915748578,
+      "training_seconds": 30.453885100083426,
+      "validation_seconds": 0.7377571000251919,
+      "examples_per_second": 13930.99759212127,
+      "best": true
+    }
+  ]
+}
