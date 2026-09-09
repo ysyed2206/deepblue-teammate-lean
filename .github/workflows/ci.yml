@@ -73,3 +73,38 @@ jobs:
           print(f'round $i: import={t1-t0:.2f}s compile+search={t2-t1:.2f}s TOTAL={t2-t0:.2f}s')
           "
           done
+
+  # Cold start for the current shipping candidates, on a fresh Linux runner --
+  # the platform's own deployment model (new container per game) and the only
+  # place this can be measured honestly. A Windows dev laptop reads fastsearch140
+  # at 107s against a 90s budget, yet 140 plays real matches fine, so the laptop's
+  # absolute numbers are useless; what matters is each build against 140 on
+  # identical hardware.
+  #
+  # 140 is the reference: it is the build currently uploaded and known to start
+  # in time. Any candidate materially slower than 140 here cannot be uploaded --
+  # missing the 90s init budget loses every game in the match, which no amount of
+  # playing strength repays.
+  cold-start-candidates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          enable-cache: false
+      - run: uv sync
+      - run: |
+          for m in 140 162 170; do
+            NUMBA_CACHE_DIR=$(mktemp -d) uv run python -c "
+          import time, os
+          t0 = time.perf_counter()
+          import importlib
+          mod = importlib.import_module('deepblue.fastsearch$m')
+          t1 = time.perf_counter()
+          mod.warm_up()
+          t2 = time.perf_counter()
+          budget = 90.0
+          print(f'fastsearch$m  import={t1-t0:.1f}s  warm_up={t2-t1:.1f}s  TOTAL={t2-t0:.1f}s  of {budget:.0f}s budget')
+          "
+          done
