@@ -22,15 +22,21 @@ and they change, so fetch them before you rely on a number.
 - Your colour is the side to move in the fen. There is no other input.
 - The process starts once per game and stays alive between your moves. Module state survives to
   your next move in the same game, never to the next game.
-- Import time has a 60 second budget before the clock starts. Load weights there.
+- Import time has a 90 second budget before the clock starts. Load weights there.
+  (Verified against https://aichessathon.com/docs/rules.md on 2026-09-09; this
+  file previously said 60s.)
 - 120 s + 0.5 s per move, per side, on wall time. One core, 2 GB, no network, no GPU.
 - Illegal move, malformed output, crash, out of memory, or flag fall loses that game. A move
   reply over 4 KB counts as illegal. 300 plies without a result goes to material adjudication.
 - Everything in the zip together stays under 50 MB unzipped.
-- Six uploads per team per day, and the latest one that passed validation is the one that plays.
+- Ten uploads per team per day, and the latest one that passed validation is the one
+  that plays. (Verified 2026-09-09; this file previously said six.)
 - Rated games start from curated opening positions, not the standard start. The set is not
   published.
-- The process keeps its core while the opponent thinks, so pondering on their time is allowed.
+- Pondering is NOT allowed. The rules say your process is suspended while your
+  opponent moves, so work between your own moves does not run. (Verified
+  2026-09-09; this file previously said the opposite, which would have
+  justified building a pondering system that cannot work.)
   Two of your games can run at once, in separate containers.
 
 ## Things that break agents here
@@ -81,3 +87,7 @@ log to the dashboard; that log is the authority. The harness exists so local gam
 
 Python 3.12, type-annotated, ruff and mypy strict clean. Keep `agent.py` readable: it is the
 thing a judge reads if your games get flagged, and the thing you have to explain at the final.
+
+## Current state
+
+See HANDOFF.md for what is shipped, what is running, and what has been ruled out.

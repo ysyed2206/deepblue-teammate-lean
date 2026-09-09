@@ -12,7 +12,7 @@ import chess
 import numpy as np
 
 TYPES = (chess.KNIGHT, chess.BISHOP, chess.ROOK, chess.QUEEN)
-NAMES = ["N", "B", "R", "Q"]
+NAMES = ["wN","wB","wR","wQ","bN","bB","bR","bQ"]
 
 
 def side(b, us):
@@ -37,7 +37,10 @@ def one(line):
     except ValueError:
         return None
     w, k = side(b, chess.WHITE), side(b, chess.BLACK)
-    return [k[i] - w[i] for i in range(4)]      # positive = Black's king is the one attacked
+    # Both sides kept separately: the penalty is a per-side nonlinear function
+    # of that king's attackers, so differencing the COUNTS first would fit the
+    # wrong thing. Columns 0-3 = attackers on White's king, 4-7 = on Black's.
+    return w + k
 
 
 def main():

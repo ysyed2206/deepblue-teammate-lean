@@ -1277,3 +1277,101 @@ def king_attack_danger_tuned_white_relative(bb, phase, total_phase):
     if danger_to_black > KING_DANGER_THRESHOLD:
         penalty_black = (danger_to_black * danger_to_black) // KING_DANGER_SCALE
     return ((penalty_black - penalty_white) * phase) // total_phase
+
+
+# ---------------------------------------------------------------------------
+# King danger weighted by ATTACKED SQUARES rather than presence (2026-09-09).
+#
+# Every attack-units scheme on the Chessprogramming wiki multiplies a piece's
+# weight by HOW MANY king-zone squares it attacks. Ours adds the full weight if
+# the piece attacks the zone at all, so a knight touching one corner of the
+# ring counts the same as a queen raking three squares through it.
+#
+# Fitted on 60k quiet positions carrying deep Stockfish scores, holding our own
+# danger -> penalty shape (sum, squared, over a scale):
+#
+#     presence          N=58 B=50 R=77 Q=87   scale 410   val MSE 0.029854
+#     attacked squares  N=35 B=38 R=27 Q=73   scale 410   val MSE 0.029751
+#
+# For scale: every WEIGHT RATIO tested -- ours, Stockfish's, the classic
+# 2/2/3/5 units, the 20/20/40/80 variant, and a free fit -- landed within
+# 0.00005 of each other. This is twice that spread. The ratio was never the
+# axis that mattered; the shape of the input is.
+#
+# Cost at runtime is one popcount on a mask the term already computes.
+KING_SQ_ATTACK_WEIGHT_N = 35
+KING_SQ_ATTACK_WEIGHT_B = 38
+KING_SQ_ATTACK_WEIGHT_R = 27
+KING_SQ_ATTACK_WEIGHT_Q = 73
+KING_SQ_DANGER_SCALE = 410
+
+
+@njit(cache=True, nogil=True)
+def king_attack_danger_squares_white_relative(bb, phase, total_phase):
+    """King danger scaled by the number of king-zone squares attacked."""
+    if phase <= 0:
+        return np.int64(0)
+    white_king = bb[WK]
+    black_king = bb[BK]
+    if white_king == np.uint64(0) or black_king == np.uint64(0):
+        return np.int64(0)
+    occupied = np.uint64(0)
+    for piece in range(12):
+        occupied |= bb[piece]
+
+    wk = lsb(white_king)
+    bk = lsb(black_king)
+    white_zone = KING_ATTACKS[wk] | (np.uint64(1) << np.uint64(wk))
+    black_zone = KING_ATTACKS[bk] | (np.uint64(1) << np.uint64(bk))
+
+    danger_to_white = np.int64(0)
+    bits = bb[BN]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        danger_to_white += KING_SQ_ATTACK_WEIGHT_N * popcount(KNIGHT_ATTACKS[square] & white_zone)
+    bits = bb[BB_]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        danger_to_white += KING_SQ_ATTACK_WEIGHT_B * popcount(bishop_attacks(square, occupied) & white_zone)
+    bits = bb[BR]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        danger_to_white += KING_SQ_ATTACK_WEIGHT_R * popcount(rook_attacks(square, occupied) & white_zone)
+    bits = bb[BQ]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        danger_to_white += KING_SQ_ATTACK_WEIGHT_Q * popcount(queen_attacks(square, occupied) & white_zone)
+
+    danger_to_black = np.int64(0)
+    bits = bb[WN]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        danger_to_black += KING_SQ_ATTACK_WEIGHT_N * popcount(KNIGHT_ATTACKS[square] & black_zone)
+    bits = bb[WB]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        danger_to_black += KING_SQ_ATTACK_WEIGHT_B * popcount(bishop_attacks(square, occupied) & black_zone)
+    bits = bb[WR]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        danger_to_black += KING_SQ_ATTACK_WEIGHT_R * popcount(rook_attacks(square, occupied) & black_zone)
+    bits = bb[WQ]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        danger_to_black += KING_SQ_ATTACK_WEIGHT_Q * popcount(queen_attacks(square, occupied) & black_zone)
+
+    penalty_white = np.int64(0)
+    penalty_black = np.int64(0)
+    if danger_to_white > 0:
+        penalty_white = (danger_to_white * danger_to_white) // KING_SQ_DANGER_SCALE
+    if danger_to_black > 0:
+        penalty_black = (danger_to_black * danger_to_black) // KING_SQ_DANGER_SCALE
+    return ((penalty_black - penalty_white) * phase) // total_phase
