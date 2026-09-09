@@ -1161,3 +1161,119 @@ def pawn_structure_tuned_white_relative(bb):
         if black_on_file > 0 and (black_pawns & neighbours) == np.uint64(0):
             score += ISOLATED_PAWN_TUNED * black_on_file
     return score
+
+
+# ---------------------------------------------------------------------------
+# King-attack weights FITTED to Stockfish scores (2026-09-09).
+#
+# The shipped weights above (N 81, B 81, R 121, Q_STRONG 202) were each chosen
+# by analogy -- 202 is the classic attack-unit ratio (minor 2, rook 3, queen 5)
+# rescaled to keep the knight at 81. Two of them were never actually measured:
+# fastsearch141 was supposed to test B=81/R=121, but that change was made in
+# THIS shared file, so 140 and 141 are byte-identical and the "-34 Elo" it
+# recorded is one build playing itself. The values stayed in regardless.
+#
+# These four are instead fitted by coordinate descent on 120k quiet positions
+# carrying deep Stockfish evaluations, holding our exact danger -> penalty
+# shape (sum of weights, squared, over 512). Validation MSE on a held-out 20%:
+#
+#     N 81 B 81  R 121 Q 202   0.032537   <- shipped in 140, 150, 162
+#     N 81 B 52  R 44  Q 10    0.031757      Stockfish's own, for reference
+#     N 62 B 42  R 65  Q 100   0.031663   <- fitted, below
+#
+# The queen is the whole story. Sweeping it alone, 202 is the WORST value
+# anywhere in 10..202, and the curve is flat from 60 to 121. Round 80 shows
+# what that costs in play: our evaluation scored an attack at +90 that a 45
+# second search scores at -77.
+#
+# Isolated from the shipped constants deliberately. The last time a king-safety
+# experiment edited a shared constant it silently changed the champion too, and
+# the resulting match compared a build against itself.
+KING_ZONE_ATTACK_WEIGHT_N_TUNED = 62
+KING_ZONE_ATTACK_WEIGHT_B_TUNED = 42
+KING_ZONE_ATTACK_WEIGHT_R_TUNED = 65
+KING_ZONE_ATTACK_WEIGHT_Q_TUNED = 100
+
+
+@njit(cache=True, nogil=True)
+def king_attack_danger_tuned_white_relative(bb, phase, total_phase):
+    """As king_attack_danger_strongq_white_relative, with fitted weights.
+
+    Written out piece by piece rather than looping over (index, weight) pairs:
+    Numba specialises such a loop for every element and that took this module's
+    cold compile from 63.7s to 124.9s, past the 90s platform init budget.
+    """
+    if phase <= 0:
+        return np.int64(0)
+    white_king = bb[WK]
+    black_king = bb[BK]
+    if white_king == np.uint64(0) or black_king == np.uint64(0):
+        return np.int64(0)
+    occupied = np.uint64(0)
+    for piece in range(12):
+        occupied |= bb[piece]
+
+    wk = lsb(white_king)
+    bk = lsb(black_king)
+    white_zone = KING_ATTACKS[wk] | (np.uint64(1) << np.uint64(wk))
+    black_zone = KING_ATTACKS[bk] | (np.uint64(1) << np.uint64(bk))
+
+    danger_to_white = np.int64(0)
+    bits = bb[BN]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        if KNIGHT_ATTACKS[square] & white_zone:
+            danger_to_white += KING_ZONE_ATTACK_WEIGHT_N_TUNED
+    bits = bb[BB_]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        if bishop_attacks(square, occupied) & white_zone:
+            danger_to_white += KING_ZONE_ATTACK_WEIGHT_B_TUNED
+    bits = bb[BR]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        if rook_attacks(square, occupied) & white_zone:
+            danger_to_white += KING_ZONE_ATTACK_WEIGHT_R_TUNED
+    bits = bb[BQ]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        if queen_attacks(square, occupied) & white_zone:
+            danger_to_white += KING_ZONE_ATTACK_WEIGHT_Q_TUNED
+
+    danger_to_black = np.int64(0)
+    bits = bb[WN]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        if KNIGHT_ATTACKS[square] & black_zone:
+            danger_to_black += KING_ZONE_ATTACK_WEIGHT_N_TUNED
+    bits = bb[WB]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        if bishop_attacks(square, occupied) & black_zone:
+            danger_to_black += KING_ZONE_ATTACK_WEIGHT_B_TUNED
+    bits = bb[WR]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        if rook_attacks(square, occupied) & black_zone:
+            danger_to_black += KING_ZONE_ATTACK_WEIGHT_R_TUNED
+    bits = bb[WQ]
+    while bits:
+        square = lsb(bits)
+        bits &= bits - np.uint64(1)
+        if queen_attacks(square, occupied) & black_zone:
+            danger_to_black += KING_ZONE_ATTACK_WEIGHT_Q_TUNED
+
+    penalty_white = np.int64(0)
+    penalty_black = np.int64(0)
+    if danger_to_white > KING_DANGER_THRESHOLD:
+        penalty_white = (danger_to_white * danger_to_white) // KING_DANGER_SCALE
+    if danger_to_black > KING_DANGER_THRESHOLD:
+        penalty_black = (danger_to_black * danger_to_black) // KING_DANGER_SCALE
+    return ((penalty_black - penalty_white) * phase) // total_phase
