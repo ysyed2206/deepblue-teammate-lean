@@ -1,4 +1,7 @@
-"""CPU trainer for the independent sparse SCReLU v0 network."""
+"""Trainer for the independent sparse SCReLU v0 network. CPU by default;
+pass --device cuda to train on a GPU. Checkpoints are always loaded back
+with map_location, so a GPU-trained checkpoint drops into the CPU pipeline
+with no extra step."""
 
 from __future__ import annotations
 
@@ -35,12 +38,13 @@ def load_dataset(path: Path) -> TensorDataset:
 
 
 @torch.no_grad()
-def validate(model: PerspectiveNNUE, loader: DataLoader[Any]) -> tuple[float, float]:
+def validate(model: PerspectiveNNUE, loader: DataLoader[Any], device: str) -> tuple[float, float]:
     model.eval()
     loss_sum = 0.0
     absolute_error_sum = 0.0
     count = 0
     for indices, sides, targets in loader:
+        indices, sides, targets = indices.to(device), sides.to(device), targets.to(device)
         predictions = model(indices, sides)
         batch = int(targets.shape[0])
         loss_sum += float(probability_loss(predictions, targets)) * batch
@@ -50,6 +54,14 @@ def validate(model: PerspectiveNNUE, loader: DataLoader[Any]) -> tuple[float, fl
 
 
 def train(args: argparse.Namespace) -> dict[str, Any]:
+    if args.device.startswith("cuda") and not torch.cuda.is_available():
+        raise SystemExit(
+            "--device cuda was requested but torch.cuda.is_available() is False. "
+            "Either the machine has no NVIDIA GPU, no driver, or torch was installed "
+            "without CUDA support (reinstall from https://pytorch.org/get-started/locally/ "
+            "picking a CUDA version). Falling back silently would just train on the CPU "
+            "under a false name, so this stops instead."
+        )
     os.environ.setdefault("OMP_NUM_THREADS", str(args.threads))
     random.seed(args.seed)
     np.random.seed(args.seed)
@@ -74,7 +86,7 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
         shuffle=False,
         num_workers=0,
     )
-    model = PerspectiveNNUE(args.width)
+    model = PerspectiveNNUE(args.width).to(args.device)
     sparse_optimizer = torch.optim.SparseAdam([model.feature_weights.weight], lr=args.lr)
     dense_optimizer = torch.optim.AdamW(
         [model.feature_bias, *model.output.parameters()],
@@ -113,6 +125,9 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
             loss_sum = 0.0
             seen = 0
             for indices, sides, targets in train_loader:
+                indices, sides, targets = (
+                    indices.to(args.device), sides.to(args.device), targets.to(args.device),
+                )
                 sparse_optimizer.zero_grad(set_to_none=True)
                 dense_optimizer.zero_grad(set_to_none=True)
                 predictions = model(indices, sides)
@@ -127,7 +142,7 @@ def train(args: argparse.Namespace) -> dict[str, Any]:
             total_training_seconds += training_seconds
             total_examples += seen
             validation_started = time.perf_counter()
-            validation_loss, validation_mae = validate(model, validation_loader)
+            validation_loss, validation_mae = validate(model, validation_loader, args.device)
             validation_seconds = time.perf_counter() - validation_started
             improved = validation_loss < best_loss - args.min_delta
             if improved:
@@ -207,6 +222,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=0.002)
     parser.add_argument("--weight-decay", type=float, default=1e-5)
     parser.add_argument("--threads", type=int, default=min(12, os.cpu_count() or 1))
+    parser.add_argument("--device", type=str, default="cpu",
+                         help="'cpu' or 'cuda' (needs an NVIDIA GPU + CUDA-enabled torch)")
     parser.add_argument("--seed", type=int, default=20260904)
     parser.add_argument("--patience", type=int, default=2)
     parser.add_argument("--min-delta", type=float, default=1e-7)

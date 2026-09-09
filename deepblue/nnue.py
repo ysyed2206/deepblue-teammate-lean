@@ -197,16 +197,22 @@ def tail(white_acc, black_acc, side_to_move, output_weights_stm_side, output_wei
     """Exact int16 SCReLU tail. ``side_to_move``: 0=white, 1=black. Returns
     centipawns, relative to the side to move -- matches Deep Blue's own
     ``evaluate()`` sign convention exactly (flipped once at the end)."""
+    # The accumulators swap with the side to move; the output weights must NOT.
+    # ``model.py``'s training forward pass concatenates (stm_acc, non_stm_acc)
+    # in that fixed order, so the two output-weight halves are indexed by ROLE
+    # (side-to-move vs other side), never by colour. Swapping both together
+    # makes the two branches compute the same commutative sum, which silently
+    # returns a white-relative score to a negamax that requires a
+    # side-to-move-relative one -- the engine then steers Black into losing
+    # positions on purpose. Measured: 0/96 games before this fix.
     if side_to_move == 0:
         stm_acc = white_acc
         ntm_acc = black_acc
-        w_stm = output_weights_stm_side
-        w_ntm = output_weights_other_side
     else:
         stm_acc = black_acc
         ntm_acc = white_acc
-        w_stm = output_weights_other_side
-        w_ntm = output_weights_stm_side
+    w_stm = output_weights_stm_side
+    w_ntm = output_weights_other_side
 
     qa = np.int64(QA)
     dot = np.int64(0)

@@ -9,6 +9,16 @@
 #   mate_stm    the side to move can force mate (score above the mate threshold)
 #   mated_stm   the side to move is being mated (score below minus the threshold)
 #   legal       no assertion beyond: return a legal move, do not crash
+#   known_fail:<uci>  an OPEN defect: the engine still plays this move and we
+#                have not fixed it. Reported separately so it cannot mask a
+#                real regression -- a corpus that can never read green trains
+#                you to ignore the number.
+#   avoid:<uci>  the engine must NOT play this specific move. Added because
+#                the corpus could previously only assert things about the
+#                SCORE, and the losses that actually cost games were the
+#                engine playing one identifiable losing move from a position
+#                it scored as roughly equal -- which every score-based tag
+#                passes.
 #   no_draw     the side to move is winning and must NOT settle for a draw
 #
 # ---------------------------------------------------------------- draws
@@ -51,3 +61,6 @@ draw             | 8/8/4k3/8/8/4K3/6r1/6R1 w - - 100 80     | fifty-move claimab
 mate_stm         | 6k1/5ppp/8/8/8/8/8/R5K1 w - - 100 80     | checkmate outranks the fifty-move rule
 draw             | 8/8/8/5k2/8/1r6/K7/1r6 w - - 0 1        | STALEMATE with pseudo-legal captures available: Ka2 can pseudo-capture on b3 and b1, both illegal, and no quiet move is legal either. Counting pseudo tactical moves was not enough to detect this. (An earlier line here was labelled stalemate and was actually checkmate; --verify caught it.)
 draw             | 8/8/3r4/8/7k/7n/7K/5q2 w - - 0 1         | second stalemate of the same shape: the only pseudo-capture h2h3 is illegal
+
+# ------------------------------------------------- self-inflicted king safety
+known_fail:g2g4 | 2r3k1/p3rppp/Pp1q1n2/2pp1b2/Q7/2P1P2P/1P1NBPP1/R2R2K1 w - - 1 18 | Round 58 (2026-09-07), lost by checkmate. 18. g4 shoves the g-pawn two squares off our own castled king with queens and all four rooks on; Black answered Rxe3 and mated using g3 and h3, the squares 17. h3 and 18. g4 vacated. The flat shield term charged 15cp for g4 and NOTHING for h3, because its mask counted rank+1 and rank+2 as an equally intact shield. Third loss of this exact shape -- agent.py's own history records two earlier ones.

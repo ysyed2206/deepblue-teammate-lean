@@ -591,3 +591,655 @@ test, is now 10.3% - down from the 27.7% modelled against search0, and far
 below quiescence generation. It has not earned priority.
 
 *No further feature is being started. Reporting for a decision.*
+
+## 2026-09-06: the 60ms methodology bug, and what it invalidated
+
+**Every paired result recorded before this date was measured at 60 ms/move**,
+the default of `tools/paired_fast_variants*.py`. At 60 ms this engine
+completes **depth 4**. Every search technique with a depth threshold
+therefore never fired in the test that rejected it:
+
+| technique | gate | old verdict | status |
+|---|---|---|---|
+| null move pruning | depth>=4, R=3 -> null searched at depth 0 | 40.6% reject | **WRONG - now shipped** |
+| late move reductions | depth-gated | 43.8%, 5-6 attempts | **WRONG - now shipped** |
+| ProbCut | depth>=5, 2nd path depth>=10 | 48.3% hold | retesting |
+| singular extensions | depth>=8-10 | 48.1% | genuinely dead at min_depth 10 |
+| LMP / razoring / SEE pruning | depth-gated | untested/rejected | see below |
+| aspiration windows | needs deep ID | "neutral" | retesting |
+
+Non-gated changes (check extension, mate distance pruning, eval terms) did at
+least execute at depth 4, so their sign may hold, but their magnitudes were
+calibrated at an operating point 25-50x faster than real play (competition
+games average 1.7-2.9 s/move).
+
+### New gate: tools/sprt_gate.py
+Parallel workers, SPRT sequential stopping, real tournament seed positions as
+openings. Self-validated: identical engines score exactly 50.0% (+4 =8 -4).
+Fixed-depth mode is deterministic (kills the AC-001 "sign flip across
+replays" jitter); time mode is the decisive gate for speed techniques, whose
+payoff is extra depth and is invisible at fixed depth.
+
+### Results
+Depth reached at a 2-second budget, start position:
+
+    fastsearch57 (old champion)   depth 7
+    fastsearch65 (+NMP)           depth 8    4.3x fewer nodes
+    fastsearch67 (+LMR)           depth 11   18x fewer nodes   <- SHIPPED
+    fastsearch68 (+LMP)           depth 13   but see below
+
+    NMP alone    59.2% over 60 games  (+64 Elo)
+    NMP+LMR      56.5% over 100 games (+45 Elo)  -> shipped as fastsearch67
+    LMP           5.0% over 20 games  (-511 Elo) -> REJECTED, decisively
+
+### The LMP lesson (generalizable)
+LMP scoring 5% is not noise, it is a signature. This engine tolerates
+techniques that REDUCE-then-verify (LMR re-searches anything beating alpha;
+NMP and ProbCut verify with a real search) but not techniques that DISCARD
+moves outright (LMP). The reason is move ordering: SEE is implemented and
+validated in deepblue/see.py but **was never wired into ordering**, so "late"
+moves are frequently good moves here. Fix ordering before retrying any
+discard-based pruning.
+
+Razoring was implemented and measured structurally inert (0.1% node change --
+its trigger essentially never fires); not worth a game test.
+
+---
+
+## 2026-09-06/07 overnight session
+
+Four changes shipped, measured over 120+ paired games each. Fourteen
+rejected. The pattern in what survived is the most useful result here.
+
+### Shipped
+
+| Change | Result | Mechanism |
+|---|---|---|
+| gravity history | **+67 Elo** / 120 games | history records failures as penalties and self-limits, instead of only growing until it saturates |
+| SEE pruning in quiescence | **+32 Elo** / 120 games | quiescence was 59-71% of all nodes and unpruned; captures that lose material by force now skip their whole subtree |
+| continuation history | **+39 Elo** / 80 games | quiet-move ordering conditioned on the opponent's previous move |
+| bishop pair | **+41 Elo** / 120 games | 28cp; the base evaluation priced every bishop identically |
+| single-legal-move exit | free | forced replies played at 0ms instead of consuming a full move budget |
+
+### Rejected
+
+**Time management -- eight distinct approaches, none positive.**
+
+    moves-remaining schedule 28->44   neutral over two independent runs
+    best-move stability               -39 Elo
+    node-fraction effort              test invalid (see below)
+    budget utilisation floor          -64 Elo
+    INCREMENT_FRACTION 0.75->1.0      neutral (50.5% at 100 games)
+    Stockfish moves-in-time formula   -70 Elo
+    Stockfish sudden-death formula    -79 Elo
+    complexity (legal-move count)     47.5% over 80 games
+
+The conclusion is structural rather than a tuning failure. Total time is
+fixed, and at this engine's strength roughly DOUBLING a move's time buys one
+extra ply -- so shifting time between moves trades a ply here for a ply
+there. Reallocation is close to zero-sum. The only time change that worked
+did not reallocate anything: it stopped spending time on moves with no
+alternative.
+
+Two specific traps worth recording:
+
+* The node-fraction candidate was tested in `--mode time`, which gives every
+  move a fresh budget. Time management can only be measured in `--mode
+  clock`, where spending now genuinely costs later. In fixed-time mode it
+  read +107 Elo purely because it was allowed up to 2520ms against the
+  baseline's 2000ms. Fixed-time testing of a clock change measures nothing.
+* The Stockfish formula was first ported from the DEEPBLUE1 handoff, which
+  implemented the `movestogo != 0` branch. This competition is SUDDEN DEATH
+  with increment, which uses a different formula entirely. Both branches were
+  then tested; both lost. Stockfish's curve is tuned for an engine reaching
+  depth 20+, where thinking longer in complex positions pays; at depth 9 the
+  returns flatten much sooner.
+
+**Search techniques.**
+
+    singular extensions   47.5%   costs +43-55% nodes for the same depth
+    TT 20->22 bits        50.8%   1M -> 4M entries; cache locality offsets retention
+    delta pruning         38.8%   stacked on SEE, over-prunes quiescence
+    capture history       dropped +37-120% nodes at fixed depth; two bound values tried
+    lazy evaluation       dropped no NPS gain
+
+**Evaluation.**
+
+    rook open/semi-open file   51.9% over 80 games -- discarded, borderline
+                               (constants 22/11/18 were never tuned for this
+                               engine; a scaled version remains untested)
+
+### What generalises
+
+Every accepted change improves how well the engine searches each node --
+ordering quality or evaluation accuracy. Every rejected change tried to make
+it search *more* nodes, or moved time between moves. On an engine that is
+already heavily pruned (NMP, LMR, RFP, futility, SEE), additional pruning
+mostly re-cuts what is already cut, while ordering and evaluation still have
+real headroom.
+
+### Methodology notes
+
+* Node counts predicted outcomes reliably; wall-clock microbenchmarks did
+  not. An "eval is 80% of runtime" measurement, taken by calling `evaluate()`
+  from Python in a loop, was dominated by Numba dispatch overhead that does
+  not exist inside the compiled search. The lazy-eval candidate built on that
+  reading produced no gain, which is what exposed it. Counted quantities are
+  trustworthy here; timed ones need care.
+* A reading of ~53% at 80 games is genuinely ambiguous in this project:
+  three separate candidates sat there and went on to 51.9% (discarded),
+  50.5% (decayed to nothing) and 54.6% (shipped). Candidates in that band get
+  120 games before a decision, applied uniformly.
+
+### Late additions (same session)
+
+    doubled/isolated pawns    +66 Elo / 80 games   SHIPPED
+    knight outposts           51.2% / 80 games     discarded
+
+Doubled/isolated pawns was the strongest single result of the session and the
+only candidate to reach formal significance (interval excluding zero) at 80
+games rather than needing 120.
+
+Knight outposts is worth recording alongside rook placement, because the two
+failed eval terms share something the four successful ones do not: their
+WEIGHTS WERE INVENTED rather than taken from an established source. Bishop
+pair used the conventional 28cp, the pawn penalties are standard values, and
+gravity/continuation history inherited constants from the already-tuned
+history table. Rook placement (22/11/18) and outposts (20/30/22 by rank) were
+both guessed, and both landed in the 51-52% neutral band -- close enough to
+suggest the CONCEPT is sound and the numbers are not. Retuning either is a
+separate experiment; with a deadline close, eval terms whose weights come
+from an established source are the better bet.
+
+    steeper passed-pawn curve (1.5x)   46.9% / 80 games   discarded
+
+This refines the "invented weights" pattern above rather than confirming it.
+The passed-pawn CURVE is established and already measured positive; only the
+1.5x multiplier applied to it was invented, and that was enough to lose 22
+Elo. Overvaluing a passer evidently pushes the engine to advance it into
+positions where it is won rather than promoted. The distinction that actually
+holds across the session is narrower than "established source": the four
+eval/ordering changes that worked used values AS PUBLISHED, while all three
+that failed (rook placement, knight outposts, this) used values someone here
+chose or scaled.
+
+    Ethereal budget formula (time+25*inc)/20   50.6% / 80 games   discarded
+    node-effort scaling (Ethereal 0.5-2.4)     built, untested
+
+Ethereal's formula is MORE generous early than ours (6.6s vs 4.66s on move 1)
+and still measured neutral, which closes the last structural question: our
+allocator is not mis-shaped in either direction. Nine approaches tested, none
+positive. The only clock change that ever worked did not reallocate anything
+-- it stopped searching when there was exactly one legal move.
+
+### Texel tuning of the evaluation weights (2026-09-07)
+
+    tuned weights (14 params, fitted on 120k positions)   38.8% / 80 games   REJECTED
+
+Fitted by coordinate descent on the logistic objective against positions
+carrying depth 46-58 engine evaluations, 20% held out. Both training (+1.97%)
+and holdout (+1.87%) error improved, and the resulting weights were
+chess-sensible -- a passed pawn on the seventh went 95 -> 163, the doubled
+penalty 12 -> 48. It still lost 80 Elo in actual games.
+
+Two things worth keeping from this:
+
+* THE OBJECTIVE MEASURES THE WRONG THING. Agreement with a strong engine's
+  STATIC score is a proxy. Our evaluation is not used statically -- it ranks
+  moves inside a search millions of nodes deep, and a weight set can agree
+  better on average while ranking worse. Where a proxy objective and a paired
+  game result disagree, the game result is measuring the thing we care about.
+* THE WARNING WAS VISIBLE BEFORE THE TEST. The fit set BISHOP_PAIR_BONUS to 4
+  when a 120-game match had measured that term at +41 Elo with 28, and the
+  fitted K bottomed out at 0.05 (the floor of the search range), meaning the
+  logistic had degenerated to nearly linear and stopped weighting near-equal
+  positions -- which is the entire point of the method.
+
+A worthwhile revisit would pin the weights already measured in games and free
+only the untested ones, with K constrained to a sane range. Not attempted here
+because a proxy that contradicts a direct measurement has already said
+something about how much to trust it.
+
+TWO BUGS found while building this, both of which would have silently produced
+weights that do not transfer:
+
+* The dataset's cp is WHITE-relative while our evaluation is SIDE-TO-MOVE
+  relative. Correlation of base_evaluate against cp measured +0.343 on
+  white-to-move positions and -0.296 on black-to-move ones, cancelling to
+  0.023 overall -- the first fit was against pure noise, and produced weights
+  saying passed pawns are worthless and mobility is harmful. After aligning
+  the convention, correlation is +0.432.
+* The feature extractor initially omitted the `attacks & ~own_occ` mask that
+  mobility_white_relative applies, and carried the pawn-penalty sign in both
+  the feature and the weight, which cancels and turns the penalty into a
+  reward for doubled pawns. Verified afterwards by reconstructing evaluate()
+  exactly: residuals are zero except for the deliberately-excluded quadratic
+  king-danger term.
+
+### Bundle of individually-rejected features (2026-09-07)
+
+    rook placement + knight outposts + TT 22 bits    +61 Elo / 80 games   SHIPPED
+
+Individually these measured 51.9%, 51.2% and 50.8% and were all discarded as
+neutral. Together they measure 58.8% (+61.4 +/-61) over 80 games, positive at
+every checkpoint.
+
+The lesson is about the INSTRUMENT, not the features. This gate resolves
+roughly +/-30 Elo at 80-120 games, so a change genuinely worth +10 reads ~51%
+and gets thrown away. Stacking three of them clears the noise floor. Other
+candidates sitting at 50-52% with a sound mechanism should therefore be
+treated as UNRESOLVED rather than rejected. Candidates that read clearly
+negative are a different matter -- those are not invisible-small, they are
+harmful.
+
+### Import time: every warm measurement in this file was optimistic
+
+Numba caches compiled functions to disk, so repeated imports in one session
+are far faster than the competition's fresh process. Measured with an empty
+NUMBA_CACHE_DIR:
+
+    fastsearch109   COLD 85.3s of the 90s budget   (warm readings said 39-43s)
+    fastsearch114   COLD 83.8s of the 90s budget
+
+Missing the init budget loses the game outright, so this is the tightest
+constraint on the engine and it was being measured wrongly all session. The
+mitigation of shipping the .nbc/.nbi cache files is not available: they are
+native compiled code and the rules prohibit shipped native binaries.
+
+Empirically the platform is managing it -- rounds 46-54 all completed on
+fastsearch109 -- so real hardware is faster than this laptop's cold compile.
+But the margin is single-digit seconds and any further search code must be
+measured COLD before shipping.
+
+---
+
+## 2026-09-07: the measurement pipeline cannot resolve what we have been asking it
+
+Prompted by a direct question -- are we actually improving? -- against the
+observation that rated play keeps oscillating around 1740 while this file
+records win after win.
+
+### The contradiction
+
+Shipped gains recorded in this file:
+
+    NMP+LMR +45, gravity history +67, SEE qsearch +32, continuation history
+    +39, bishop pair +41, doubled/isolated +66, rook+outposts+TT22 +61,
+    razoring +70, futility +25, mobility +61, pawn structure +39,
+    contempt 20 +20                                    TOTAL  +566 Elo
+
+Rated performance over the same period: flat. Both cannot be true.
+
+### What the harness can actually resolve
+
+Standard error of a paired match, converted to Elo at the 50% slope:
+
+    games      1 SE          95% CI
+      60      +/-45 Elo     +/-88 Elo
+      80      +/-39 Elo     +/-76 Elo
+     120      +/-32 Elo     +/-62 Elo
+     240      +/-22 Elo     +/-44 Elo
+
+EVERY gain in the list above is smaller than the 95% interval of the test
+that measured it. The 80-game standard (adopted over 60 precisely to be
+more careful) resolves +/-76 Elo; the largest claimed increment is +70.
+
+### The mechanism: selection on noise
+
+Testing a stream of candidates that are truly worth ~0 and shipping those
+reading above ~54% does not select good changes, it selects lucky ones. The
+recorded "gain" is then the size of the luck, which at these sample sizes
+averages +40 to +70 -- exactly the range this file is full of. Twelve
+iterations of that produce "+566 Elo" and no rating movement.
+
+Worse than useless: a change truly worth -20 Elo still reads above 50% about
+one time in three at 80 games. Twelve shipped changes means several probably
+ARE negative, and nothing in these records would distinguish them.
+
+Bundling, argued for earlier the same day on the grounds that small effects
+are individually unresolvable, makes this worse rather than better: it raises
+the chance a group clears the bar, and the precedent cited in its favour
+(three individually-rejected features measuring +61 together) is equally well
+explained by three coin flips landing heads.
+
+### What this does NOT invalidate
+
+Two categories survive:
+
+* Techniques whose true effect is far above the noise floor -- transposition
+  table, PVS, quiescence, null move, LMR, futility, MVV-LVA/killers/history.
+  Our measurements of them were noisy, but effects of 50-100 Elo are large
+  enough that the SIGN is safe even if the magnitude is not.
+
+* Bug fixes verified by MECHANISM plus a reproduced real game, not by a win
+  rate. fastsearch52's mate-score fix (replayed round 20 and showed the old
+  code plays the losing move) and the graded king shield (showed the shield
+  mask scores a pawn on h3 identically to one on h2, and showed the round-58
+  game where that mattered) are both in this class. This evidence is STRONGER
+  than a 53% score over 80 games, because it explains a cause instead of
+  counting outcomes.
+
+Everything in between -- hand-picked eval constants, margin tuning, contempt,
+gravity-vs-plain history -- is unproven. The contempt axis is the clearest
+illustration: contempt 20 sits in the champion, contempt 35 measured 46.2%
+over 80, contempt 10 was queued next. That is sampling, not tuning.
+
+### Consequences adopted
+
+1. Do not ship on a ">50%" reading. That rule applied to sub-resolution
+   effects is a noise amplifier.
+2. Prefer mechanism-backed fixes over score-backed ones. Prefer a reproduced
+   game and a named cause to any win rate we can currently produce.
+3. Stop adding hand-weighted evaluation terms. We cannot measure them, so we
+   cannot know we are not hurting ourselves.
+4. When choosing what to submit, prefer the SIMPLER engine among candidates
+   that cannot be distinguished -- fewer unproven constants means fewer
+   chances that a negative one slipped through.
+
+### Open audit
+
+fastsearch118 vs fastsearch67 (accumulated claim between them: ~+496 Elo,
+which predicts ~95% for 118). Result to be recorded here whichever way it
+lands. If it comes back near 50-60%, points 1-4 above become the operating
+rules for the remainder of the competition.
+
+### Audit result (2026-09-07 21:29) -- the aggregate IS real
+
+    fastsearch67 vs fastsearch118    80 games  +5 =12 -63   13.8%
+                                     -319 Elo +/-92   LLR -3.03  (terminated)
+
+118 is +319 Elo stronger than 67. The section above speculated that the
+process might have produced nothing; that is now refuted and the speculation
+was an over-correction.
+
+The honest reading, with both halves kept:
+
+* Claimed between 67 and 118: +496 Elo. Measured: +319. The claims ARE
+  inflated -- by about 55%, which is precisely the winner's-curse signature
+  the section above predicts. Individual increment numbers in this file
+  should be read as upper bounds, not estimates.
+
+* But the accumulated direction and magnitude are real. The pipeline is
+  inefficient and its per-change numbers are overstated; it is not fictional.
+  The four operating rules above stand on the grounds that we cannot RANK
+  small changes -- not on the discredited grounds that nothing has worked.
+
+This sharpens rather than answers the original question. If +319 is real in
+self-play while rated performance oscillates around 1740, either self-play
+Elo is transferring poorly to a 334-engine field (expected, and largely
+outside our control), or the gains are HISTORICAL and recent increments have
+stalled. The remaining bake-off matches (91, 105, 109, 114, 116 against 118)
+distinguish these: if the late lineage clusters at 50%, the recent versions
+are the same engine and the flat recent rating is explained.
+
+### Full lineage bake-off (2026-09-07/08) -- the gains stopped at 105
+
+Every shipped version against the current champion, 80 games each, run
+SEQUENTIALLY with all 7 workers so no match was distorted by CPU contention.
+
+    version          score    gap to 118     significant?
+    fastsearch67     13.8%    +319 +/- 92    YES, decisive
+    fastsearch91     29.4%    +152 +/- 60    YES, decisive
+    fastsearch105    32.5%    +127 +/- 62    YES, decisive
+    fastsearch109    42.5%    + 52 +/- 63    no
+    fastsearch114    46.9%    + 22 +/- 57    no
+    fastsearch116    49.4%    +  4 +/- 53    no -- identical
+
+Read together with the claimed increments, this splits the project's history
+cleanly in two.
+
+67 -> 105 is REAL: +192 Elo measured across that stretch, decisive at every
+step. Null move, LMR, futility, gravity history, SEE quiescence pruning and
+continuation history are worth what an engine textbook says they are worth,
+and the pipeline found them.
+
+105 -> 118 is NOT: +127 down to +4, never significant, and the four versions
+shipped in that window (109, 114, 116, 118 -- marketed as 2.7, 2.8, 2.9, 3.0)
+are one engine. The claimed increments over that window were rook placement
++ knight outposts + TT 22 bits (+61), contempt 20 (+20) and razoring (+70):
++151 claimed, +52 measured against 109 and not distinguishable from zero.
+
+The sharpest single refutation: 116 -> 118 IS the razoring change, recorded
+above at "+70 Elo / 80 games" and the reason 118 became champion. Head to
+head it measures +4.3 +/- 53.
+
+What separates the two eras is not effort or care -- it is that the first era
+added SEARCH TECHNIQUES with true effects of 50-100+ Elo, comfortably above
+this harness's +/-60 resolution, and the second added EVALUATION TERMS and
+MARGIN TUNING whose true effects are in the 0-20 Elo band where the harness
+returns coin flips. The pipeline did not break. It ran out of things it was
+capable of measuring, and kept reporting results anyway.
+
+Consequence for the remaining days: adding another hand-weighted evaluation
+term is the one activity with a demonstrated zero return. Effort belongs on
+defects that can be shown mechanically -- see the round 58 / round 60
+decomposition below, which separates a SEARCH failure from an EVAL blindness
+for the first time in this project.
+
+### The graded king shield: correct mechanism, WORSE engine (2026-09-07/08)
+
+    fastsearch127 vs fastsearch118   80 games  +16 =33 -31   40.6%
+                                     -65.9 +/- 59 Elo   (CI [-125, -7], excludes zero)
+
+Rejected. Kept here because everything about its justification was true and it
+was still wrong, which is the most useful failure this project has recorded.
+
+What was true: the flat shield mask counts rank+1 and rank+2 as an equally
+intact shield, so a pawn on h3 in front of a king on g1 scores identically to
+one on h2. Demonstrated in the source, and demonstrated in round 58 where the
+engine charged itself 15cp for 18. g4 and NOTHING for 17. h3, then was mated
+using g3 and h3 -- the two squares those pushes vacated. Third loss of that
+exact shape. The graded term fixed it: h3 0 -> -10, g4 -15 -> -32, the engine
+stopped playing g4 at every time control, and the regression corpus passed
+33/33 including a new avoid:g2g4 entry.
+
+What was false: that any of the above predicts strength. The term cannot
+distinguish a pawn that ABANDONED its king from one that is ATTACKING. Found
+by applying it to a second game (round 60) before testing: with White's king
+on g1 and pawns on g3/h4 -- White's attacking plan -- the term charged White
+76cp as if the king were exposed. An engine that will not storm pawns loses
+more than a correctly-priced h3 gains.
+
+Two rules follow, and they are the ones that would have prevented shipping it:
+
+1. A mechanism story is a reason to TEST, never a reason to ship. This one had
+   a named bug, a reproduced game, a fixed regression entry and a clean
+   symmetry check, and it cost 66 Elo.
+2. Check every new term on a game where the OTHER side is doing the thing the
+   term penalises. The defect was invisible in round 58 (where we were the one
+   with the weak king) and obvious in round 60 (where we were not).
+
+Postscript on process: this candidate was packaged, sent to the user and came
+within one instruction of being uploaded on a ">50% and it shows promise"
+rule. It never reached 50%.
+
+### Time management: NOT a defect (2026-09-08, closed)
+
+Three separate claims were made tonight that the clock is being wasted. All
+three were wrong. Recorded in full so the thread is not reopened.
+
+    claim 1  "spends 2.87s/move early vs 1.50s late, 2:1 front-loaded"
+             FALSE. The 1.50s included 274 forced and mate-score moves across
+             70 games -- correct behaviour, not thinking time. Excluding
+             moves under 0.25s: 2.87s early vs 2.24s late.
+
+    claim 2  "the predictive stop has degenerated into a flat 50% cap, the
+             search throws away half its budget"
+             FALSE. Per-move attribution (tools/clock_sim.py) over round 58:
+             79% of allocation spent, and TEN of 31 moves ran OVER soft into
+             hard time at 126-140%. Stop reasons: predicted overrun 16, soft
+             budget 10, forced 3, mate found 2.
+
+    claim 3  "32% of the 120s clock is never spent"
+             TRUE as an average, MEANINGLESS as a diagnosis. It is entirely
+             explained by game length:
+
+                 round 58   39 moves    spent 79% of allocation   36% clock left
+                 round 60  149 moves    spent 81% of allocation    2% clock left
+
+             The allocator reserves against a game length it cannot predict.
+             Short games end with the reserve unspent; long games consume it
+             almost entirely. That is correct risk management. An allocator
+             that spent the reserve would flag when a game ran long -- which
+             is the failure mode the 28/12 constants were chosen to avoid.
+
+What survives, and it is small: on round 58 the losing move 18 got 2484ms of
+a 4060ms budget (61%) and reached depth 10, and moves 15-18 all sat at 59-65%
+of soft. Raising the predictive-stop floor (fastsearch128, 0.50 -> 0.80) would
+recover roughly 1.5s across that stretch. That is a 0-20 Elo lever in a band
+this harness cannot resolve -- worth one cheap 240-game match, not a project.
+
+METHOD NOTE, which is the real lesson. Every one of the three false claims
+came from aggregating across games and inspecting the components afterwards.
+Every one died to a per-move breakdown. Averages over heterogeneous games
+(different lengths, forced moves, mate scores mixed in) are how this project
+manufactures phantom defects.
+
+### fastsearch131: four standard techniques, ACCEPTED (2026-09-08)
+
+    fastsearch131 vs fastsearch118   82 games  +42 =26 -14   67.1%
+                                     +117 Elo    VERDICT: ACCEPT H1
+    (screen at 1000ms/move, H1=+30; confirmation at 2000ms pending)
+
+First formal SPRT acceptance of the session and the largest gain since the
+67 -> 91 era. Contents, and where each came from:
+
+    late move pruning          rejected here at 60ms/move -- a time control
+                               where the engine reaches depth 4 and LMP is
+                               depth-gated, so it never executed
+    delta pruning (qsearch)    profiling showed 48.7% of all nodes are
+                               quiescence; we pruned it with SEE alone
+    SEE pruning, main search    Berserk and Ethereal prune losing captures in
+                               the main search; we had SEE in qsearch only
+    internal iterative         measured TT miss rate 72.8%. Took the
+    REDUCTION                  reduction form, not classical IID: IID pays a
+                               search to decide better, the same trade that
+                               ProbCut (49.4%) and singular extensions
+                               (47.5%) both lost in this engine
+
+Smoke test before the match: +8 plies of depth across six positions, 3.4%
+FEWER nodes, and the same move chosen in all six -- the signature of pruning
+that works rather than pruning that changes decisions.
+
+WHY THIS ONE WORKED AND THE OTHERS DID NOT. Every candidate that failed this
+session came from a theory of mine about what the evaluation was missing:
+the graded king shield (-66 Elo), extended king-danger zone (+44 then -57 on
+two runs of the same pair). Every component of 131 came from either a
+measurement of this engine (qsearch share, TT miss rate) or a gap against a
+published feature list for a ~3000 Elo open-source engine. Guessing lost
+three times; measuring and copying architecture won once, by +117.
+
+ON BUNDLING. This is a four-technique bundle, argued for on exactly the
+grounds set out earlier the same day when bundling was rejected for eval
+terms: bundling is illegitimate when nothing fixes the sign of the components
+(hand-weighted eval constants), and legitimate when literature and mechanism
+both do (textbook search techniques absent from our engine). Individually
+each is worth +10-20 and therefore invisible against +/-100 Elo of run-to-run
+noise -- LMP alone measured 53.8% (+26 +/- 48), i.e. nothing. Together they
+are unmissable. The earlier bundles failed because they bundled the wrong
+KIND of change, not because bundling is wrong.
+
+COST TO WATCH: compile time 39s -> 45s (+15%) measured on an idle machine.
+Platform init budget is 90s and a miss is an instant loss; user-reported
+platform init for the 2.7 build was ~44s.
+
+### Candidates against fastsearch131 (2026-09-08)
+
+All screened at 1000ms/move, H1=+30, against the new champion. 1000ms was
+validated first: mean depth 10.3 vs 12.3 at 2000ms, and the deepest gate in
+use is NMP at depth>=4, so every technique still fires -- unlike the 60ms
+tests that wrongly rejected LMP, NMP, LMR and razoring at depth 4.
+
+    fs132  correction history, LINEAR curve      100 games  51.0%   +6.9 +/-53
+    fs134  TT 22->24 bits (76MB -> 304MB)        300 games  51.7%  +11.6 +/-32
+    fs135  correction history, QUADRATIC curve   300 games  54.2%  +29.0 +/-31
+    fs133  late move reduction for captures      260 games  48.7%   -9.4 +/-34  REJECT
+
+CORRECTION HISTORY: the technique was fine, the curve was mine and it was
+wrong. Stockfish applies the correction as cv*|cv|/11175 -- QUADRATIC, so a
+weakly-confirmed correction barely moves the evaluation and only a repeatedly
+confirmed one moves it a lot. fastsearch132 used entry//8, linear, which at
+entry=128 applies 16cp where the reference applies 1cp. Same code path, same
+technique, only the curve differs: 132 measured ~0 and wandered between 43.3%
+and 51.0% over five checkpoints; 135 measured +29.0 +/- 31 over 300 games.
+Reading the reference implementation would have saved a 100-game run.
+
+CAPTURE LMR, and why a technique from a stronger engine can still be wrong
+here: Ethereal reduces captures by 3 (2 if giving check), and our LMR already
+uses Ethereal's exact quiet formula, so this looked like a pure gap. It
+measured -9.4 and formally rejected. The likely reason is that fastsearch131
+had just added SEE PRUNING TO THE MAIN SEARCH, which already removes captures
+that lose material by force -- so what remained to reduce were captures worth
+searching. Same failure mode as taking Stockfish's KingAttackWeights without
+the machinery those weights belong to: a technique is calibrated against its
+own engine's surroundings, and ours had just changed.
+
+TRANSPOSITION TABLE: published figures put the first hash doubling at +50-70
+Elo. Two doublings here measured +11.6 +/- 32. The gap is worth recording:
+at ~1M nodes per move a 4M-entry table already holds most of a single search,
+our 72.8% miss rate is largely genuinely unique positions rather than
+evictions, and the TLB pressure the literature warns about offsets part of
+the gain. Published Elo figures are calibrated to engines searching far more
+nodes than this one.
+
+## 2026-09-08 evening: what the annotated games actually show
+
+Rounds 61-73, several with Stockfish annotations supplied by the user. This is
+the first externally-validated evidence this project has had; every prior
+diagnosis used our own engine as referee, which structurally cannot find errors
+our evaluation shares -- i.e. exactly the errors that cost games.
+
+### Errors concentrate in losses, and they are small
+
+Filtered scan (playable positions only: |eval| < 800, >=3 legal moves, not in
+check -- see tools/blunder_scan.py for why each filter exists):
+
+    wins   r61 r63 r66 r67   1 error >=100cp in 232 moves   (0.4%)
+    draw   r65               2 errors in 52 moves           (3.8%)
+    losses r62 r64           5 errors in 77 moves            (6.5%)
+
+Sixteen times the error rate in games we lose. The engine is close to
+error-free in games it wins; losses come from a handful of 150-530cp mistakes
+in still-playable positions, not from a general tendency to blunder.
+
+### Three specific undervaluations, all externally confirmed
+
+    enemy queen beside our king      priced at 11cp   (r60, r62, r69)
+    our pawn one square from queening priced at 95cp   (r73)
+    round 72                          NO error found at all
+
+The first is the KING_ZONE_ATTACK_WEIGHT_Q = 10 inversion (fixed in
+fastsearch140, which also fixed the round-58 g4 blunder that three earlier
+attempts could not). The second is PASSED_BONUS peaking at 95 on the seventh
+rank. The third is the important one.
+
+### Round 72: the loss with no mistake in it
+
+71 moves, lost by checkmate. Our scan: ZERO errors >=100cp. Stockfish, per the
+user: no real mistakes -- we played GOOD moves where the opponent played BEST
+moves. The evaluation bled steadily from -55 at move 7 to -893 at move 57 in
+slices of 20-47cp.
+
+Corroborated by the one two-sided measurement we have (round 64, tools/
+two_sided.py): opponent mean cost 0.2cp per move, ours 23.2cp.
+
+THIS IS THE CENTRAL FINDING. Against strong opponents we do not lose to
+identifiable defects. We lose ~20cp per move, sustained, and after sixty moves
+that is a lost game with nothing for a game review to flag. No constant fixes
+that. Only a better evaluation (NNUE) or materially more depth does.
+
+It also explains the session's results: search work measured +52 and +27,
+while five of six evaluation-constant changes measured flat or negative.
+Search improvements lift every move slightly; a constant only helps in the
+rare positions where that term dominates.
+
+### Clock distribution, round 72
+
+    moves <= 25 :  3.57 s/move   (18 real thinking moves)
+    moves >= 40 :  1.62 s/move   (23 real thinking moves)
+
+We spend most where the position was handed to us and least where the game is
+lost. The allocator was not the constraint -- at move 40 it budgeted ~2.9s and
+the search used 56% of it, while in the opening the search ran OVER soft into
+hard time. Endgame iterations are cheap and deep, so the growth prediction
+fires early. Tested as the predictive-stop floor change in the search bundle.

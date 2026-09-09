@@ -15,3 +15,10 @@ logs/
 nnue_lab/teammate_pawnstar/finetune/checkpoints/
 nnue_lab/production/.numba_cache/
 nnue_lab/production/.mypy_extension_cache/
+
+# Session scratch: sampled Stockfish data and derived arrays. Regenerate with
+# tools/sample_sf_positions.py, tools/filter_quiet.py, tools/extract_terms.py.
+scratch_*.txt
+scratch_*.npz
+scratch_*.npy
+scratch_*.pkl

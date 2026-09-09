@@ -19,7 +19,10 @@ from deepblue.constants import MATE_THRESHOLD  # noqa: E402
 from deepblue.reference import Engine  # noqa: E402
 
 CORPUS = Path(__file__).resolve().parent.parent / "tests" / "regression_fens.txt"
-DRAW_TOLERANCE = 15
+# Wide enough to admit a deliberate contempt score on a terminal draw
+# (fastsearch144 returns -20 rather than 0 so the search steers away from
+# drawn endings), still tight enough to catch a draw scored as +/-900.
+DRAW_TOLERANCE = 25
 
 
 class _Reference:
@@ -90,6 +93,41 @@ class _Fast:
         return bool(self._fs.insufficient_material(bb, occ))
 
 
+class _Variant:
+    """Any deepblue.fastsearchNNN module, behind the same interface.
+
+    _Fast is pinned to deepblue.fastsearch -- the ORIGINAL engine, not the one
+    that actually plays. So every corpus run has been validating a module the
+    submission does not use. This makes the corpus point at whichever variant
+    is being considered, which is the only way an entry about the champion's
+    behaviour can mean anything.
+    """
+
+    def __init__(self, module_name: str) -> None:
+        import importlib
+
+        from deepblue.fastcore import from_fen
+
+        module = importlib.import_module(f"deepblue.{module_name}")
+        suffix = module_name.replace("fastsearch", "")
+        self.name = module_name
+        self._fs = module
+        self._from_fen = from_fen
+        self._engine = getattr(module, f"FastEngine{suffix}")()
+        # Pay the JIT cost once, before anything is timed.
+        self._engine.search(from_fen(chess.STARTING_FEN), 200, 400)
+
+    def search(self, fen: str, movetime_ms: int):
+        move, score, depth, _, _ = self._engine.search(
+            self._from_fen(fen), movetime_ms, movetime_ms * 1.5
+        )
+        return move, score, depth
+
+    def insufficient(self, fen: str) -> bool:
+        bb, occ, _, _ = self._from_fen(fen)
+        return bool(self._fs.insufficient_material(bb, occ))
+
+
 def check(engine, tag: str, fen: str, note: str, movetime_ms: int) -> tuple[bool, str]:
     board = chess.Board(fen)
 
@@ -141,6 +179,16 @@ def check(engine, tag: str, fen: str, note: str, movetime_ms: int) -> tuple[bool
         return True, f"score {result.score:+d}"
     if tag == "legal":
         return True, f"{result.move} score {result.score:+d} depth {result.depth}"
+    if tag.startswith("known_fail:"):
+        banned = tag.split(":", 1)[1]
+        if result.move == banned:
+            return True, f"STILL BROKEN (expected): plays {banned} ({result.score:+d})"
+        return True, f"NOW FIXED: plays {result.move} instead of {banned}"
+    if tag.startswith("avoid:"):
+        banned = tag.split(":", 1)[1]
+        if result.move == banned:
+            return False, f"played the banned move {banned} (score {result.score:+d})"
+        return True, f"{result.move} score {result.score:+d} depth {result.depth}"
     return False, f"unknown tag {tag!r}"
 
 
@@ -150,9 +198,16 @@ def main() -> None:
     parser.add_argument(
         "--engine", choices=("reference", "fast", "fast1"), default="reference"
     )
+    parser.add_argument(
+        "--module",
+        help="test a specific variant, e.g. fastsearch126 (overrides --engine)",
+    )
     arguments = parser.parse_args()
 
-    engine = {"reference": _Reference, "fast": _Fast, "fast1": _Fast1}[arguments.engine]()
+    if arguments.module:
+        engine = _Variant(arguments.module)
+    else:
+        engine = {"reference": _Reference, "fast": _Fast, "fast1": _Fast1}[arguments.engine]()
     print(f"engine: {engine.name}\n")
     failures = 0
     total = 0
