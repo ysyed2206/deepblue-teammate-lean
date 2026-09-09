@@ -67,16 +67,71 @@ Motivating games: round 86 drew a Q+3P vs Q+3P ending our eval scored +83,
 built from doubled pawns and king placement — both real, neither convertible.
 Round 79 drew a +195 position the same way.
 
+## Clock schedule: front-loaded, starves long games (BUILD THIS)
+
+`deepblue/time_manager.py` sets `BASE_MOVES_REMAINING = 28`, `MIN_MOVES_REMAINING = 12`.
+The allocator assumes ~28 moves remain and decays to a floor of 12 by about
+move 32. In a long game that budgets as though the game were a fraction of its
+real length.
+
+Round 88 (2026-09-09), 171 moves, drawn:
+
+    phase          us      them
+    moves  1-15   5.00s   3.49s     we spend 43% more
+    moves 16-30   3.55s   2.13s     we spend 67% more
+    moves 31-45   2.10s   2.02s
+    moves 46+     0.53s   0.75s
+    final clock   2.0s    14.6s     (166 of our moves)
+
+By move 40 we had 11.0s against their 56.3s with 126 moves still to play, then
+sat on pure increment (~0.5s/move) for 120 moves. The same shape appears in
+r82 (5.4s vs 53.4s), r80 (4.5s vs 26.3s) and r81 (3.7s vs 17.9s).
+
+**Do not be misled by the 94-game average.** Aggregated we spend 3.15s per move
+in moves 1-15 against opponents' 3.73s and finish 31.4s against 32.4s -- so on
+average we are the FASTER side. That average is dominated by ~43-move games
+where the schedule never bites. In long games it is severe. An earlier analysis
+in this project concluded "time management is not the problem" from that
+average; that conclusion was too strong and round 88 is the counter-example.
+
+Simulated schedules (validated: 28/12 reproduces r81 almost exactly):
+
+    sched    move 40   last 10 moves   wasted in a 45-move game
+    28/12     1.51s        0.58s              8.8s   <- current
+    32/13     1.93s        0.64s             13.2s   <- knee of the curve
+    44/15     1.97s        0.98s             31.5s
+    50/16     1.91s        1.26s             39.5s
+
+32/13 captures nearly all the midgame gain for the least short-game waste.
+
+**Two honest limits.** The 28->44 change has been tested twice against itself
+and came back flat both times -- but at 20/40/60 games, which resolves nothing,
+so treat that as no information rather than as evidence. And no schedule fixes
+the deep endgame: with a 0.5s increment, ~0.5-0.7s per move past move 70 is
+simply what is sustainable unless the opening is starved.
+
+**What it did NOT cost.** Round 88's ending was rook and bishop against rook
+with no pawns -- a theoretical draw. Our eval scored it +410 at depth 22, which
+is the scale-factor bug above, not a clock bug. The clock did not lose that
+point because no point was available. The open and untested question is whether
+more time in moves 16-30 would have avoided trading the last pawn INTO that
+drawn ending, which is where the game was really decided.
+
+Since `sprt_gate.py` runs fixed ms/move, a schedule change is NOT exercised by
+self-play at all. It has to be judged on real games or on clock simulation
+(`tools/clock_sim.py`), not on a match.
+
 ## What has been ruled out (do not re-litigate)
 
 - **King-attack weight RATIOS do not matter.** Ours, Stockfish's, classic
   2/2/3/5 units, 20/20/40/80 and a free fit all land within 0.00005 of each
   other under our formula. The magnitude and the SHAPE of the input matter;
   the ratio does not.
-- **Time management is not the problem.** Over 94 real games we spend 3.15s
-  per move in moves 1-15 against opponents' 3.73s, and end games with 31.4s
-  against their 32.4s. We are not the slower side. Running low correlates with
-  LONG games (74 moves average vs 43), not with losing.
+- **Time management on AVERAGE is fine, but see the clock-schedule section
+  above -- the average hides a real failure in long games.** Over 94 games we
+  spend 3.15s per move in moves 1-15 against opponents' 3.73s and finish 31.4s
+  against 32.4s, but that is dominated by ~43-move games. In long games we are
+  badly starved (r88: 2.0s vs 14.6s).
 - **In-game vs cold divergence is not one component.** Clearing the TT, the
   history/killers, the continuation history or the correction history each
   recovers only about a quarter of the gap.
