@@ -66,8 +66,42 @@ PANIC_BUDGET_MS = 30.0
 # translating into won games. Effort moved to fastsearch87 (stability-aware
 # time management: read the search's own best-move/score stability instead
 # of a move-count schedule) instead of a third attempt at this constant.
-MIN_MOVES_REMAINING = 12
-BASE_MOVES_REMAINING = 28
+#
+# 2026-09-09, RETUNED 28/12 -> 36/14. Round 88 forced this: a 171-move draw in
+# which we spent 43% more than the opponent in moves 1-15 and 67% more in moves
+# 16-30, then finished on 2.0s against their 14.6s, sitting on pure increment
+# (~0.5s/move) for the last 120 moves. Rounds 80, 81 and 82 show the same shape
+# (5.4s vs 53.4s, 3.7s vs 17.9s, 4.5s vs 26.3s at the end).
+#
+# The miscalibration is straightforward. BASE_MOVES_REMAINING assumed 28 of our
+# moves remained at move 0. Measured over 102 real games, the median game is 49
+# of our moves, the 75th percentile 64, the 90th 71 and the longest 166. We were
+# budgeting for roughly half the median game.
+#
+# Simulated over those 102 REAL game lengths rather than an assumed one:
+#
+#     sched   mean s/move in moves 30-70   avg clock left at the end
+#     28/12            1.57s                       13.2s
+#     36/14            1.87s                       21.3s
+#     40/14            1.92s                       25.6s
+#     50/16            1.88s                       36.7s
+#
+# 36/14 buys +19% in moves 30-70 -- the window where games are actually
+# converted -- for 8s more average unspent clock. Beyond 40 the mid-game gain
+# flattens while the waste keeps climbing.
+#
+# WHAT THIS CANNOT DO. At move 110 of a 166-move game every schedule above
+# yields ~0.5s per move, because by then the bank is gone and 0.5s is simply
+# what the increment sustains. No schedule fixes the deep endgame; only moving
+# faster earlier or a larger increment would, and we control neither.
+#
+# The previous two attempts at this constant (2026-09-05 and 2026-09-06 above)
+# came back "flat" at 20/40/60 games, which resolves nothing finer than about
+# +/-90 Elo. Treat those as no information rather than as evidence against.
+# A real test is `sprt_gate.py --mode clock` with --base-moves-baseline and
+# --base-moves-candidate, which is the only mode that exercises allocate().
+MIN_MOVES_REMAINING = 14
+BASE_MOVES_REMAINING = 36
 
 # Fraction of the increment we are willing to spend as if it were already banked.
 INCREMENT_FRACTION = 0.75

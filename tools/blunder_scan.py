@@ -25,7 +25,7 @@ import chess.pgn
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 MS = 1500
-MODULE = "fastsearch150"
+MODULE = "fastsearch180"
 
 
 def analyse(path: str):
