@@ -173,6 +173,64 @@ anything came from using this engine as its own referee -- the blind referee the
 Stockfish tooling exists to replace. Rounds 90, 94, 97 and 98 were a pattern
 found in noise.
 
+## USE DONOR_NEXT_IDEAS.md. It is the best-sourced backlog in this repo.
+
+240 lines of cited search research -- Reckless commit SHAs with their SPRT Elo
+deltas, cross-checked against Stockfish, Ethereal, Coda and Viridithas source,
+with an explicit note on which claims were independently re-verified and which
+were not. It is dependency-ordered and triaged smallest-first.
+
+I ignored it for a full session and invented eval candidates instead. Those
+measured -40, flat, flat and flat. Ten minutes in this document produced a
+better-motivated candidate than any of them. Read it FIRST.
+
+Checked against fastsearch185, its history section says:
+
+    gravity            185 HAS IT (fastsearch91)
+    malus              185 HAS IT (symmetric, reuses the bonus)
+    HISTORY_MAX 16384  185 HAS IT -- the donor-majority constant
+    bonus shape        NOT DONE -> fastsearch192
+
+fastsearch192 is the document's own step 2. 185 used min(depth*depth, 1536),
+the depth-squared family (Ethereal, Pawnstar). Four donors use linear-capped
+instead and the survey calls it the modern consensus: Stockfish
+min(133*d - 81, 1487), Reckless min(184*d, 1742), Coda clamp(0, 1653, 245*d - 18),
+Viridithas min(mul*d + offset, max). 192 adopts Stockfish's exact shape.
+
+Why it plausibly matters, which is visible without any match:
+
+    depth    185 (d*d)   192 (linear)
+        1            1            52
+        3            9           318
+        6           36           717
+       12          144          1487
+
+The gravity update is `entry + bonus - entry*bonus/16384`. A bonus of 9 barely
+moves an entry at all, so at depths 3-6 -- where the overwhelming majority of
+nodes are -- our history table has been close to inert, only learning at depths
+that are rare. That is a candidate explanation for the measured first-move
+cutoff rate of 85.1% against a ~90% benchmark.
+
+STILL UNBUILT, all cited in that document, roughly in its own priority order:
+
+  * malus with its OWN slope/offset/ceiling (Coda, Reckless, Stockfish all
+    separate it; ours reuses the bonus symmetrically)
+  * Reckless's malus divisor -- divide malus by the count of quiets already
+    punished at that node, so one wide node cannot mass-poison the table. We
+    apply full malus to EVERY tried quiet.
+  * LMP-7: qsearch movecount cutoff (move_count>=3: break). Flagged "fully
+    independent, testable immediately".
+  * LMP-2: in-check guard for LMP. Reckless ran 18 months without it, then
+    measured +1.19 Elo over 138,000 games.
+  * priority #3: SEE good/bad noisy partition + qsearch skip. fastsearch191 did
+    the main-search half (+13.9 +/-29, inconclusive); the qsearch half is
+    untouched.
+
+CAUTION the document states about itself: Coda's NMP body and Stockfish's
+update_all_stats scaling fractions were NOT verified, and the
+ordering-before-LMR sequencing is "a well-supported prior, not a proven fact".
+Donor precedent says what is worth testing, not what will work here.
+
 ## What has been ruled out (do not re-litigate)
 
 - **King-attack weight RATIOS do not matter.** Ours, Stockfish's, classic

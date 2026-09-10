@@ -22,3 +22,10 @@ scratch_*.txt
 scratch_*.npz
 scratch_*.npy
 scratch_*.pkl
+
+# NNUE training data: distributed as GitHub RELEASE ASSETS (up to 2GB each),
+# never committed -- git rejects files over 100MB and keeps every blob forever.
+# See the nnue-data-v1 release and NNUE_TRAINING_HANDOFF.md.
+nnue_train_*.npz
+nnue_validation_*.npz
+scratch_*.log
