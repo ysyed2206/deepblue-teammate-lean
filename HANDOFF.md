@@ -282,6 +282,112 @@ update_all_stats scaling fractions were NOT verified, and the
 ordering-before-LMR sequencing is "a well-supported prior, not a proven fact".
 Donor precedent says what is worth testing, not what will work here.
 
+## NNUE — the biggest available gain, and it is BLOCKED ON A HUMAN
+
+Every handcrafted eval change measured this session was flat or negative (see
+the scoreboard). Every confirmed Elo gain in this project's history came from
+SEARCH. That is the signal that the handcrafted evaluation is at its ceiling,
+and a trained network is the thing that lifts it. Rounds 84 and 98 are the
+evidence: at depth 16 our eval rates three candidate moves within 13cp of each
+other and Stockfish calls one of them an inaccuracy. No search change reaches
+that.
+
+### Status: waiting on a teammate to send back a trained checkpoint
+
+Two friends were asked. Nothing has arrived. `origin/master` has no branches
+other than master and no NNUE weights. Check with:
+
+    git fetch origin && git branch -r && git log origin --all --oneline -5
+
+### What is ALREADY DONE — do not redo any of this
+
+  * **Training data is prepared.** 28.5M positions from the Lichess evaluation
+    database (FENs with deep Stockfish scores), already encoded:
+
+        lichess_eval_npz       28.5M positions   3.99 GB
+        lichess_eval_npz_12M   11.4M positions   1.60 GB
+        lichess_eval_npz_4_6M   4.4M positions   0.62 GB
+
+    in `C:/Users/uniqu/AppData/Local/Temp/deepblue-teammate-data/`. Each is an
+    npz with keys `indices` / `sides` / `targets`.
+
+  * **The 11.4M pair is published** as GitHub release assets on tag
+    `nnue-data-v1` (release assets allow 2GB each; git itself rejects anything
+    over 100MB, which is why they are gitignored). Anyone with repo access:
+
+        gh release download nnue-data-v1 --dir data
+
+  * **A beginner-proof training manual exists**: `NNUE_TRAINING_HANDOFF.md`.
+    Google Colab + free T4, five cells, ~1 hour, with the real asset IDs baked
+    into the download cell.
+
+  * **The 21GB raw Lichess eval database** is at
+    `.../deepblue-teammate-data/lichess_eval/lichess_db_eval.jsonl.zst` if more
+    or different data is ever needed. Downloading it again would take hours.
+
+### The architecture, and what must match
+
+`deepblue/nnue.py` (252 lines) is a complete production evaluator: weight
+loading, feature mapping, incremental accumulator updates. It expects
+
+    INPUT_SIZE 768      NUM_KING_BUCKETS 8      FEATURE_ROWS 6144
+    QA 255              QB 64                   SCALE 400
+
+and VALIDATES those from the file header -- a mismatched net is refused, loudly,
+rather than silently misbehaving. **Width is NOT validated**: `train.py` offers
+128/256/512 and the quantiser reads the checkpoint's own width, so any of them
+loads fine.
+
+Pipeline: `nnue_lab/train.py` -> `.pt` checkpoint ->
+`nnue_lab/teammate_pawnstar/scratch_train/quantize_scratch.py` -> `PSN1` `.bin`
+-> `deepblue/nnue.py` loads it.
+
+### How it plugs into the search — search work is NOT lost
+
+They are separate layers. `fastsearchNNN` is the SEARCH (alpha-beta, LMR, null
+move, singular extensions, multicut, TT, move ordering, time management). NNUE
+replaces only `evaluate()`, called at leaf nodes. Every search gain -- 131's
++52, 162's +32.5, 185's -- is retained.
+
+`fastsearch30` already did this and is the working precedent:
+
+    static_eval = dnnue.tail(white_acc_row, black_acc_row, side_to_move, ...)
+
+It is not a one-line swap, because NNUE is incremental: an accumulator is
+updated as moves are made and unmade (`compute_delta`, `apply_delta`, and
+`refresh` when the king crosses a bucket boundary). That plumbing exists and was
+verified against 100,000 real positions via `tools/nnue_incremental_gate.py`.
+
+### The three risks, in order
+
+1. **Init budget.** Weights load at import, inside the platform's 90s, on top
+   of the Numba compile. 185 already measures **122.0s single-core** on this
+   laptop (see the init section). A width-512 net is ~13MB of int16. Measure
+   with `tools/init_onecore.py` -- NOT package_lean's figure, which is taken
+   with all cores free and understated the cost by 1.72x once already.
+2. **Nodes per second.** NNUE eval is slower per call than the handcrafted one,
+   so depth drops. The bet is that better judgement beats lost depth. Usually
+   true by a wide margin, but it must be matched, not assumed.
+3. **Provenance.** The organiser ruled: weights must come from training WE
+   started. Initialising from a released net (e.g. Pawnstar's, which is on disk
+   at `.../donor_reference/pawnstar-v12.bin`) and fine-tuning counts as shipping
+   that net. `train.py` initialises randomly and has NO resume flag, so a normal
+   run is compliant by construction. Continuing from a TEAMMATE's from-scratch
+   checkpoint would be fine, but would need ~5 lines added to train.py.
+
+### If two nets arrive
+
+You cannot merge them -- averaging independently-trained networks produces
+garbage. Pick one. Both `summary.json` files report
+`validation_teacher_mae_cp` on the same held-out positions, so the nets can be
+ranked by reading two files, no match needed. But a lower MAE means a better
+EVALUATOR, not automatically a better ENGINE: a bigger net judges better and
+evaluates slower. That comparison needs one match between two engine builds.
+
+Ask for **width 256 and width 512** rather than two runs at the same width --
+two nets trained the same way on the same data are near-duplicates and tell you
+nothing.
+
 ## What has been ruled out (do not re-litigate)
 
 - **King-attack weight RATIOS do not matter.** Ours, Stockfish's, classic
