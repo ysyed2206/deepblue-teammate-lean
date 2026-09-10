@@ -121,7 +121,7 @@ Since `sprt_gate.py` runs fixed ms/move, a schedule change is NOT exercised by
 self-play at all. It has to be judged on real games or on clock simulation
 (`tools/clock_sim.py`), not on a match.
 
-## The transposition table has no ageing (REAL DEFECT, fix under test)
+## The transposition table has no ageing (real gap, but FIXING IT IS FLAT)
 
 fastsearch185's replacement rule is, in full:
 
@@ -157,11 +157,21 @@ numpy pass over 4M int16 per move, under 10ms against ~2000ms.
 On round 90 move 43, where 185 played Kd3 -- a move NO fixed depth from 10 to 22
 chooses -- 187 plays Ra6+, which is what a fresh engine plays.
 
-IF 187 IS FLAT: then the in-game-versus-cold divergence is the heuristics working
-as intended, not a defect, and it should stop being carried as an open bug. It
-has been treated as one since round 58 without anyone testing whether it costs
-anything, and the only evidence it did came from using this engine as its own
-referee -- the blind referee the Stockfish tooling exists to replace.
+RESULT (2026-09-10): 187 measured -0.0 +/-41 over 140 games, oscillating around
+zero across seven checkpoints (-17.4, -52.5, -5.8, +13.0, -3.5, +5.8, -0.0).
+FLAT.
+
+So the conclusion, stated as promised before the match was run: THE IN-GAME
+VERSUS COLD DIVERGENCE IS NOT A DEFECT. The missing generation field is a real
+gap against Stockfish, but closing it changes nothing measurable. A warm engine
+and a fresh one choose differently because the heuristics are working, not
+because the table is stale.
+
+DO NOT REOPEN THIS. It was carried as an open bug from round 58 to round 98 on
+the strength of an argument, never a measurement, and the only evidence it cost
+anything came from using this engine as its own referee -- the blind referee the
+Stockfish tooling exists to replace. Rounds 90, 94, 97 and 98 were a pattern
+found in noise.
 
 ## What has been ruled out (do not re-litigate)
 
