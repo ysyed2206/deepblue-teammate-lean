@@ -524,7 +524,7 @@ TWO HONEST CAVEATS, recorded rather than buried:
   worth trying; 20 may be well off the peak.
 
 
-fastsearch150 = fastsearch116 + razoring (added 2026-09-07). The mirror of
+fastsearch185 = fastsearch116 + razoring (added 2026-09-07). The mirror of
 reverse futility pruning: RFP asks whether the static evaluation is far
 enough ABOVE beta to assume a fail-high, razoring asks whether it is far
 enough BELOW alpha that the node is hopeless. The difference that matters is
@@ -541,7 +541,7 @@ The 60ms-era gate ran at depth 4, where a depth<=3 condition barely fires and
 the quiescence verification dominates whatever remains. Null move and LMR
 were recovered from the same broken gate and are worth +64 and +39.
 
-    fastsearch150 vs fastsearch116, --mode time --move-ms 2000, 7 workers:
+    fastsearch185 vs fastsearch116, --mode time --move-ms 2000, 7 workers:
     20 games  45.0%  -34.9 +/-121 Elo
     40 games  55.0%  +34.9 +/- 88 Elo
     60 games  60.0%  +70.4 +/- 71 Elo
@@ -561,9 +561,9 @@ from pathlib import Path
 
 import chess
 
-from deepblue import fastsearch150
+from deepblue import fastsearch185
 from deepblue.fastcore import from_fen
-from deepblue.fastsearch150 import FastEngine150
+from deepblue.fastsearch185 import FastEngine185
 from deepblue.time_manager import allocate
 
 # Opening prep: every real qualification PGN reviewed so far starts from a
@@ -601,8 +601,8 @@ def _book_move(fen: str) -> str | None:
 # actually moves, and the published value is only the starting assumption.
 DEFAULT_INCREMENT_MS = 500
 
-_engine = FastEngine150()
-fastsearch150.warm_up()  # forces the Numba JIT compile now, inside the import budget
+_engine = FastEngine185()
+fastsearch185.warm_up()  # forces the Numba JIT compile now, inside the import budget
 _moves_played = 0
 _increment_ms = float(DEFAULT_INCREMENT_MS)
 _previous_clock_ms: float | None = None
