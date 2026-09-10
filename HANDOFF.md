@@ -121,6 +121,48 @@ Since `sprt_gate.py` runs fixed ms/move, a schedule change is NOT exercised by
 self-play at all. It has to be judged on real games or on clock simulation
 (`tools/clock_sim.py`), not on a match.
 
+## The transposition table has no ageing (REAL DEFECT, fix under test)
+
+fastsearch185's replacement rule is, in full:
+
+    if tt_depth[index] <= depth or tt_key[index] != value:
+
+Depth-preferred, with no notion of WHEN an entry was written. An entry stored at
+depth 14 on move 5 can never be evicted by a shallower one, so it survives the
+whole game and keeps being probed and trusted long after its position is gone.
+`grep -c generation` over fastsearch185.py returns 0.
+
+Stockfish has exactly the field we lack -- a generation counter, so entries from
+older searches are preferentially replaced even when deeper. This is the answer
+to "engines like Stockfish have history and do not make these mistakes": the
+problem was never that state is carried, it is that ours never expires.
+
+**This had already been found and thrown away.** fastsearch154 implemented a
+proper per-entry generation and measured -7.9 Elo, a number this harness cannot
+distinguish from zero, and it was discarded on that basis. Check the sample size
+before believing any verdict in this repo's history.
+
+fastsearch187 is the fix under test: one line at the start of each search,
+
+    np.subtract(self.tt_depth, 1, out=self.tt_depth, where=self.tt_depth > 0)
+
+Decrementing every stored depth per move gives both effects of a generation
+counter -- old entries lose replacement priority AND stop satisfying
+`tt_depth >= depth`, so they are re-searched instead of trusted -- with no
+signature changes. A real generation field must be threaded through negamax,
+quiescence and search_root, and argument-threading misses have silently broken
+three candidates here (that is why tools/check_calls.py exists). Cost is one
+numpy pass over 4M int16 per move, under 10ms against ~2000ms.
+
+On round 90 move 43, where 185 played Kd3 -- a move NO fixed depth from 10 to 22
+chooses -- 187 plays Ra6+, which is what a fresh engine plays.
+
+IF 187 IS FLAT: then the in-game-versus-cold divergence is the heuristics working
+as intended, not a defect, and it should stop being carried as an open bug. It
+has been treated as one since round 58 without anyone testing whether it costs
+anything, and the only evidence it did came from using this engine as its own
+referee -- the blind referee the Stockfish tooling exists to replace.
+
 ## What has been ruled out (do not re-litigate)
 
 - **King-attack weight RATIOS do not matter.** Ours, Stockfish's, classic
@@ -132,9 +174,11 @@ self-play at all. It has to be judged on real games or on clock simulation
   spend 3.15s per move in moves 1-15 against opponents' 3.73s and finish 31.4s
   against 32.4s, but that is dominated by ~43-move games. In long games we are
   badly starved (r88: 2.0s vs 14.6s).
-- **In-game vs cold divergence is not one component.** Clearing the TT, the
+- **In-game vs cold divergence is not one component** -- clearing the TT, the
   history/killers, the continuation history or the correction history each
-  recovers only about a quarter of the gap.
+  recovers only about a quarter of the gap. But see the TT-ageing section
+  above: the underlying defect (a table that never expires) is real and was
+  identified afterwards.
 - **fastsearch173** (one prior repetition scores -CONTEMPT at every ply) makes
   the whole tree collapse to +/-CONTEMPT in shuffling endgames. Use the ply-1
   form in 183/185 instead.
