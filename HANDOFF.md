@@ -1,7 +1,44 @@
-# Deep Blue — state as of 2026-09-09 evening
+# Deep Blue — state as of 2026-09-10
 
-Read this first, then `git log -5`. Written to let a fresh session resume
-without the previous conversation.
+## READ THIS FIRST — the three commands a new session should run
+
+    tail -6 scratch_192.txt      # the match that is running RIGHT NOW
+    git log --oneline -8         # what happened and why
+    grep -c . DONOR_NEXT_IDEAS.md   # the best-sourced backlog in this repo
+
+`scratch_*` files are GITIGNORED, so they exist only on this laptop and are the
+only record of a running or finished match. Do not delete them before reading
+them. `tail` is enough; they are plain text, one line per 20 games.
+
+### What is running right now
+
+**fastsearch192 vs fastsearch185**, 300 fixed games, log `scratch_192.txt`.
+It survives this session ending -- it is a detached background process. To
+check it later, just `tail scratch_192.txt`. To see whether it is still going:
+
+    powershell -NoProfile -Command "if (Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $_.CommandLine -like '*sprt_gate*' }) { 'RUNNING' } else { 'stopped' }"
+
+**A keep-awake process is also running** (`scratchpad/keep_awake.py`). This
+machine uses Modern Standby and slept for 23 minutes across five episodes
+before it was started; since then, 1 second. If it dies, matches stall. Restart:
+
+    .venv/Scripts/python.exe tools/keep_awake.py &
+
+Keep the laptop on AC -- hibernate-after is 6 hours on battery.
+
+### How to read a match result
+
+    140 games  +36 =68 -36   50.0%   -0.0 +/-41 Elo  LLR -0.25
+
+The Elo figure and its error bar are the only things that matter. This harness
+resolves about +/-65 at 60 games and +/-30 at 300. Anything at 20-60 games is
+NOISE -- three good ideas were thrown away in this project's history on samples
+that could not resolve them (singular extensions, later +32.5; the clock
+schedule, twice; TT ageing). Never ship on a null result; that is how the Q=202
+regression got in.
+
+---
+
 
 ## What is uploaded and what to upload
 
@@ -33,14 +70,28 @@ also does badly, the search additions are the culprit and the next thing to
 strip is the search, not the eval.** That is the open question; only the
 tournament can answer it.
 
-## Running now
+## The scoreboard — every candidate measured, 2026-09-09/10
 
-`tools/sprt_gate.py fastsearch180 fastsearch185 ... --fixed-games --max-pairs 150`
-output in `scratch_185.txt`. At 240 games it read +17.4 +/-34, LLR +0.48, trend
-rising over seven checkpoints. 185 = 180 + three bundled changes: timing
-(stability-scaled soft budget), repetition (one prior occurrence scores
--CONTEMPT at ply 1 only), and attacked-square king danger. Each is isolated so
-a negative result can be bisected.
+    build  what it is                                  result vs its baseline
+    185    180 + timing + ply-1 repetition + atk-sq    +17.4 +/-31  300 games  SHIPPED
+    191    losing captures ordered last (SEE)          +13.9 +/-29  300 games  inconclusive
+    184    185 minus the eval change                    -2.9 +/-32  240 games  flat
+    187    TT ageing by depth decay                     -0.0 +/-41  140 games  flat
+    190    scale factor by pawn count                  -39.9 +/-44  140 games  NEGATIVE
+    192    linear history bonus                        RUNNING
+
+**fastsearch185 is the upload** (DeepBlue 3.7). Nothing has beaten it.
+
+191 is the near-miss worth revisiting: +13.9 with a mechanism, and its cost is
+TIME (a SEE per capture at every node), not accuracy. Caching the SEE result, or
+only running it where MVV-LVA is ambiguous, could keep the ordering gain without
+paying for it -- that is a real follow-up, not a dead end.
+
+190 is the cautionary tale: it had the BEST fit of any eval change measured
+(validation MSE -0.002461, larger than all the others combined) and lost about
+40 Elo in play. **Fit quality did not predict Elo.** Probable cause: scaling the
+evaluation down while RFP, razoring and delta keep fixed centipawn margins
+changes what gets pruned, and it cost a ply.
 
 ## The biggest un-built finding
 
