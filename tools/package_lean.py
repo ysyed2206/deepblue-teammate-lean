@@ -69,7 +69,7 @@ def machine_load_factor() -> float:
 DEFAULT_OUT = ROOT / "submission_lean.zip"
 
 # Files that are not import targets but must ship anyway.
-EXTRA_FILES = ["deepblue/opening_book.json"]
+EXTRA_FILES = ["deepblue/opening_book.json", "deepblue/deepblue_nnue_v3.bin"]
 
 
 def imported_modules(entry: Path) -> set[str]:

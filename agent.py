@@ -561,9 +561,9 @@ from pathlib import Path
 
 import chess
 
-from deepblue import fastsearch150
+from deepblue import fastsearch180n
 from deepblue.fastcore import from_fen
-from deepblue.fastsearch150 import FastEngine150
+from deepblue.fastsearch180n import FastEngine180n
 from deepblue.time_manager import allocate
 
 # Opening prep: every real qualification PGN reviewed so far starts from a
@@ -601,8 +601,8 @@ def _book_move(fen: str) -> str | None:
 # actually moves, and the published value is only the starting assumption.
 DEFAULT_INCREMENT_MS = 500
 
-_engine = FastEngine150()
-fastsearch150.warm_up()  # forces the Numba JIT compile now, inside the import budget
+_engine = FastEngine180n()
+fastsearch180n.warm_up()  # forces the Numba JIT compile now, inside the import budget
 _moves_played = 0
 _increment_ms = float(DEFAULT_INCREMENT_MS)
 _previous_clock_ms: float | None = None
