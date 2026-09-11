@@ -27,6 +27,17 @@ dev = ["mypy>=1.18", "ruff>=0.14"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+exclude = [
+    "baselines",
+    "champion",
+    "deepblue",
+    "deepblue-patch-01-baseline",
+    "nnue_lab",
+    "tests",
+    "tools",
+    "tuning",
+    "scratch_*.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
@@ -35,3 +46,7 @@ ignore = ["N818"]
 [tool.mypy]
 strict = true
 files = ["agent.py", "harness"]
+
+[[tool.mypy.overrides]]
+module = "deepblue.*"
+ignore_errors = true

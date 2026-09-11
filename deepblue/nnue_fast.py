@@ -42,7 +42,7 @@ from deepblue.fastcore import (
     FLAG_CASTLE,
     lsb,
 )
-from deepblue.nnue import *  # noqa: F401,F403 - shared loader/mapping/format
+from deepblue.nnue import *  # noqa: F403 - shared loader/mapping/format
 from deepblue.nnue import QA, QB, SCALE, compute_delta, feature_row, king_bucket, refresh
 
 WK, BK = 5, 11

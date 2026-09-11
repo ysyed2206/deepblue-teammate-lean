@@ -577,10 +577,9 @@ from deepblue.time_manager import allocate
 # so it can only ever save time or improve the first move, never cost
 # anything -- the existing fallback/repetition machinery is untouched.
 try:
-    _OPENING_BOOK = json.loads(
-        (Path(__file__).resolve().parent / "deepblue" / "opening_book.json").read_text(encoding="utf-8")
-    )
-except Exception:  # noqa: BLE001 - a missing/corrupt book must never break the agent
+    _book_path = Path(__file__).resolve().parent / "deepblue" / "opening_book.json"
+    _OPENING_BOOK = json.loads(_book_path.read_text(encoding="utf-8"))
+except Exception:
     _OPENING_BOOK = {}
 
 
@@ -589,7 +588,7 @@ def _book_move(fen: str) -> str | None:
         key = " ".join(fen.split(" ")[:4])
         entry = _OPENING_BOOK.get(key)
         return entry["best_move"] if entry else None
-    except Exception:  # noqa: BLE001 - same reliability guarantee as the fallback below
+    except Exception:
         return None
 
 # The published time control is 120 s + 0.5 s/move, but the agent API is only
@@ -602,7 +601,7 @@ def _book_move(fen: str) -> str | None:
 DEFAULT_INCREMENT_MS = 500
 
 _engine = FastEngine180n()
-fastsearch180n.warm_up()  # forces the Numba JIT compile now, inside the import budget
+fastsearch180n.warm_up(_engine)  # forces the Numba JIT compile now, inside the import budget
 _moves_played = 0
 _increment_ms = float(DEFAULT_INCREMENT_MS)
 _previous_clock_ms: float | None = None
@@ -649,7 +648,7 @@ def _record_after(board: chess.Board, uci: str) -> None:
             _engine.record_game_position(from_fen(board.fen()))
         finally:
             board.pop()
-    except Exception:  # noqa: BLE001 - deliberately total
+    except Exception:
         pass
 
 
@@ -686,7 +685,7 @@ def get_move(fen: str, time_left_ms: int) -> str:
             # either, and duplicating this logic is how it drifts out of sync.
             _engine.record_game_position(from_fen(fen))
             _record_after(board, only_uci)
-        except Exception:  # noqa: BLE001 - never let bookkeeping lose a game
+        except Exception:
             traceback.print_exc(file=sys.stderr)
         _moves_played += 1
         return only_uci
@@ -706,6 +705,7 @@ def get_move(fen: str, time_left_ms: int) -> str:
         book_uci = _book_move(fen)
         book_move = chess.Move.from_uci(book_uci) if book_uci is not None else None
         if book_move is not None and book_move in board.legal_moves:
+            assert book_uci is not None
             chosen = book_uci
             _moves_played += 1
             print(f"deepblue: opening book move {book_uci}", file=sys.stderr)

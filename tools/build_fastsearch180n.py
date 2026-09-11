@@ -1,6 +1,3 @@
-import re
-from pathlib import Path
-
 with open("deepblue/fastsearch180.py", "r", encoding="utf-8") as f:
     text = f.read()
 
