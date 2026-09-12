@@ -226,7 +226,6 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--data", type=Path, required=True)
-    parser.add_argument("--h512-model", type=Path)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--count", type=int, default=10_000)
     parser.add_argument("--iterations", type=int, default=100_000)
@@ -243,19 +242,11 @@ def main():
     if arrays.count < args.count:
         parser.error("insufficient feature positions")
     h256 = load_quantized_npz(args.model)
-    h512 = (
-        load_quantized_npz(args.h512_model)
-        if args.h512_model is not None
-        else synthetic_parameters(512, 20260919)
-    )
     report = {
         "format": "deepblue-q1-tail-exact-paired-benchmark-v1",
         "canonical_unchanged": True,
         "timing": "perf_counter_ns elapsed, warmed JIT, randomized interleaved kernel order",
-        "load_caveat": (
-            "Concurrent six-thread H512 training and data acquisition/preprocessing "
-            "may affect timing; no affinity pinning."
-        ),
+        "load_caveat": "No CPU affinity pinning is applied.",
         "bank_semantics": (
             "128 real feature positions; varied position and side prevents invariant-call hoisting"
         ),
@@ -270,7 +261,7 @@ def main():
         "trials": args.trials,
         "models": [],
     }
-    for model, path in ((h256, args.model), (h512, args.h512_model)):
+    for model, path in ((h256, args.model),):
         bank, kernels, params, correctness = check_model(model, arrays.indices, args.count, rng)
         measurements = paired_benchmark(
             model, bank, kernels, params, args.iterations, args.trials, rng

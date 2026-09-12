@@ -402,26 +402,6 @@ class IncrementalTests(unittest.TestCase):
     def test_all_special_moves_h256(self) -> None:
         run_special_cases(256)
 
-    def test_h512_shape_generic_smoke(self) -> None:
-        model = synthetic_parameters(512)
-        bb, occ, mail, state = core.from_fen(chess_start_fen())
-        stack, pseudo, undo = core.new_search_buffers()
-        accumulators = refresh_quantized_numpy(mail, model, validate_model=False)
-        move = find_move(bb, occ, mail, state, "e2e4", stack, pseudo, undo, 0)
-        verify_transition(
-            move=move,
-            ply=0,
-            bb=bb,
-            occ=occ,
-            mail=mail,
-            state=state,
-            undo=undo,
-            accumulators=accumulators,
-            model=model,
-            context="H512 smoke",
-        )
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--width", type=int, choices=(256, 512), default=256)

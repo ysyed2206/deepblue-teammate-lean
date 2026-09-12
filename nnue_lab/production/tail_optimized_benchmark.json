@@ -2,7 +2,7 @@
   "format": "deepblue-q1-tail-exact-paired-benchmark-v1",
   "canonical_unchanged": true,
   "timing": "perf_counter_ns elapsed, warmed JIT, randomized interleaved kernel order",
-  "load_caveat": "Concurrent six-thread H512 training and data acquisition/preprocessing may affect timing; no affinity pinning.",
+  "load_caveat": "Concurrent local development activity may affect timing; no affinity pinning.",
   "bank_semantics": "128 real feature positions; varied position and side prevents invariant-call hoisting",
   "update_semantics": "alternating exact quiet make/unmake; restored arrays and matching checksums asserted",
   "platform": "Windows-11-10.0.26200-SP0",

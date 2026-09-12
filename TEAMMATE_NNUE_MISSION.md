@@ -6,7 +6,7 @@ You are joining an active AI Chessathon project called **Deep Blue**.
 
 Your job is **NNUE only**.
 
-Do **not** duplicate the main search-engine work. Another Claude session is already improving search (PVS / TT / qsearch / SEE / history / LMR / pruning). Another worker is already training from-scratch H256/H512 models on the primary machine.
+Do **not** duplicate the main search-engine work. Another Claude session is already improving search (PVS / TT / qsearch / SEE / history / LMR / pruning). Another worker is already training a from-scratch H256 model on the primary machine.
 
 Your highest-value contribution is to build the **production NNUE compatibility + inference lane** that can accept the strongest allowed weights later, with a special focus on a Pawnstar-style H1024×8-bucket NNUE because it is strong, compact, and structurally much simpler than current Stockfish/Coda NNUEs.
 
@@ -197,11 +197,9 @@ There is a completed participant-trained H128 baseline in `nnue_lab/`:
 
 A separate worker has also:
 
-- built no-bucket H256/H512 production infrastructure
+- built no-bucket H256 production infrastructure
 - passed 50,000 exact incremental transitions for H256
-- passed H512-compatible differential checks
 - trained Stage-1 H256 on ~3M examples
-- started H512 Stage-1
 - acquired millions more CC0 Lichess positions
 
 Do not duplicate that exact work.
@@ -639,7 +637,6 @@ Do NOT spend hours recreating:
 
 ```text
 no-bucket H256 Stage-1
-no-bucket H512 Stage-1
 the exact same 3M training corpus
 ```
 

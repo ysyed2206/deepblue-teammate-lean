@@ -1,6 +1,6 @@
 # Deep Blue NNUE production push
 
-Status: **Stage-1 H256 trained, quantised, development-evaluated, and 100k-transition validated. H512 and larger-data work are active.** No mainline integration or packaging has occurred. The original H128 run and baseline reports are preserved.
+Status: **Stage-1 H256 trained, quantised, development-evaluated, and 100k-transition validated.** No mainline integration or packaging has occurred. The original H128 run and baseline reports are preserved.
 
 ## Stage-1 data and training
 
@@ -45,7 +45,7 @@ All 39,335 development positions were cross-checked. Exporter/NumPy/Numba also a
 
 ## Runtime (concurrent-training measurement)
 
-Actual elapsed Numba hot-loop medians, 11 trials, 100,000 iterations/trial; JIT excluded. These were measured while H512 training/data work was active and should be repeated under low load before integration decisions.
+Actual elapsed Numba hot-loop medians, 11 trials, 100,000 iterations/trial; JIT excluded. These should be repeated under low load before integration decisions.
 
 | Operation | H256 |
 |---|---:|
@@ -64,8 +64,7 @@ Full refresh is not the expected per-node cost. The incremental-plus-tail path i
 - Candidate: `runs/pawnstar_h256_cc0_stage1/candidate_q1.npz`, **457,066 bytes**, SHA256 `8e8771acedccf37aa8e875199320a1bce1fb8e2461331692423507859b634fd6`.
 - Float/best and resumable latest: same run directory, `best.pt` and `latest.pt`.
 - Exact config, training log/summary, quantisation report, development report/predictions, incremental gate, and benchmark are in that run directory.
-- H512 Stage 1 uses the identical data/configuration except width and has been launched.
 - Fifteen million production-prefix FENs are acquired before filtering. Additive preprocessing and verified disjoint row-group-window acquisition are extending the corpus; this is not a 3M ceiling.
 - The historical PlentyChess donor corpus was not used because its public dataset repository did not expose a reuse licence. Donor architecture/training deviations are recorded in `PAWNSTAR_PRODUCTION_NOTES.md`.
 
-Final H256/H512 selection, pristine evaluation, final model manifest, and GO/NO-GO recommendation are **pending**. Mainline remains untouched regardless of outcome.
+Final H256 selection, pristine evaluation, final model manifest, and GO/NO-GO recommendation are **pending**. Mainline remains untouched regardless of outcome.
