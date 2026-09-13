@@ -1,81 +1,93 @@
-# AI Chessathon starter
+# Deep Blue
 
-Fork this to build an agent for [AI Chessathon](https://aichessathon.com). It gives you a working
-submission, baselines to beat, and a local harness that speaks the same protocol and enforces the
-same clock as the platform, so you can see whether a change actually helped before you upload it.
+Deep Blue is a Python chess engine built for the [Optiver AI Chessathon](https://aichessathon.com).
+It is designed for a constrained tournament environment: a single CPU core, a strict per-move
+clock, no network access during games, and a source-readable submission.
+
+The current competition entry is [`agent.py`](agent.py). It exposes the required
+`get_move(fen, time_left_ms) -> str` interface and uses the `FastEngine185` search engine.
+
+## Engine design
+
+The engine combines a classical, handcrafted evaluation with an aggressively pruned alpha-beta
+search. The emphasis is on making reliable decisions within the clock rather than on a particular
+headline search depth.
+
+- Iterative-deepening negamax with alpha-beta and principal-variation search.
+- A fixed-size transposition table using Zobrist hashing.
+- Quiescence search, including check evasion and static-exchange pruning of losing captures.
+- Null-move pruning, reverse futility pruning, late-move reductions, multicut and singular
+  extensions, each guarded by re-search or verification where appropriate.
+- Move ordering from hash moves, captures, killers and gravity-based history heuristics.
+- Tapered middlegame/endgame evaluation with material, piece-square tables, pawn structure,
+  passed pawns, rook files, mobility, king shelter and king-attack terms.
+- Time allocation based on the remaining clock, observed increment and root-move stability.
+- Opening preparation for known tournament seed positions, with legality checks before use.
+- Defensive handling of repetition, terminal positions, exceptions and low-clock fallback moves.
+
+The agent warms its Numba-compiled search functions during import so compilation does not take
+time from its first move.
+
+## Repository layout
 
 ```
-git clone https://github.com/advitrocks9/aichessathon-starter
-cd aichessathon-starter
-make setup
-make play
+agent.py                 Competition entry point and game-level safety logic
+deepblue/                Board representation, search, evaluation and time manager
+tests/                   Unit and regression tests
+harness/                 Local game runner and packaging tools
+baselines/               Simple reference opponents
+tools/                   Profiling, regression, packaging and experiment utilities
+docs/                    Notes on engine development and experiment methodology
+nnue_lab/                Offline neural-evaluation research; not used by agent.py
 ```
 
-That plays your agent against a baseline over a full 120 s + 0.5 s game and prints the result.
-When you like it, `make zip` and drop `submission.zip` on your dashboard.
+`nnue_lab/` is retained as research code only. The current submission does **not** load an NNUE
+model or require model weights at runtime.
 
-## Writing an agent
+## Run locally
 
-`agent.py` is the whole submission. One function:
+This project uses [uv](https://docs.astral.sh/uv/) for its development environment.
+
+```bash
+uv sync
+make play     # one full-clock game against the greedy baseline
+make arena    # a small fast-game arena
+make gate     # lint, type check and two smoke games
+make zip      # build submission.zip with agent.py at the archive root
+```
+
+You can also start a local game from a specific FEN:
+
+```bash
+make play FEN="r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
+```
+
+## Testing approach
+
+Engine changes are developed as isolated candidates, checked against a regression position set,
+then tested in paired local games. A promising score over a small number of games is treated as a
+lead, not proof: chess results are noisy, so candidates are only promoted once the measurement is
+large enough to distinguish a real gain from variance.
+
+Historical experiments and design decisions are documented in
+[`EXPERIMENTS.md`](EXPERIMENTS.md), [`ARCHITECTURE.md`](ARCHITECTURE.md), and
+[`ENGINE_GUIDE.md`](ENGINE_GUIDE.md). [`HANDOFF.md`](HANDOFF.md) is a detailed working log and may
+contain machine-specific notes; it is useful for development context rather than as end-user
+documentation.
+
+## Submission contract
+
+The competition platform imports `agent.py` and repeatedly calls:
 
 ```python
 def get_move(fen: str, time_left_ms: int) -> str:
-    return "e2e4"
+    ...  # returns a UCI move such as "e2e4" or "e7e8q"
 ```
 
-The fork ships a legal random-mover, so the loop works before you write anything. Replace the body.
+The authoritative requirements are the [agent contract](https://aichessathon.com/docs/agent-contract.md)
+and [competition rules](https://aichessathon.com/docs/rules.md). Always check those documents before
+uploading: local packaging and harness tests are safeguards, not platform acceptance decisions.
 
-```
-make play                                          # one game, real time control
-make arena                                         # 20 fast games, prints a score
-make play FEN="<fen>"                              # start from a given position
-uv run python -m harness.play --black baselines/minimax --pgn game.pgn
-uv run python -m harness.arena --opponent ../my-old-version --games 200
-```
+## License
 
-Anything your agent writes to stdout or stderr shows up under the result, so `print` debugging
-works. The platform discards it during rated games and shows it in your validation log.
-
-## The ladder
-
-Measured with `harness/arena.py`. Beating greedy is a search. Beating minimax is a search plus an
-evaluation worth searching with.
-
-| Matchup | Games | Time control | Score |
-|---|---|---|---|
-| random vs greedy | 20 | 10 s + 0.1 s | 10.0% (+1 =2 -17) |
-| greedy vs minimax | 6 | 120 s + 0.5 s | 0.0% (+0 =0 -6) |
-| numba vs minimax | 6 | 10 s + 0.5 s | 66.7% (+2 =4 -0) |
-
-- `baselines/random` plays a uniformly random legal move. It is what `agent.py` starts as.
-- `baselines/greedy` searches one ply on material.
-- `baselines/minimax` searches two plies on material and mobility, with no time management.
-- `baselines/numba` is `minimax` with the evaluation jitted. It is barely stronger, which is
-  the point: jitting a shallow search buys headroom, not depth. Read it for the warm-up call
-  at the bottom, which is how you keep compilation off your clock.
-
-## What's here
-
-```
-agent.py             your submission
-baselines/           random, greedy, minimax, numba; each is a directory with an agent.py
-harness/runner.py    the process the platform runs your agent in
-harness/referee.py   the clock, legality, draw and adjudication rules
-harness/rules.py     the event constants the harness enforces
-harness/sandbox.py   the one process, spoken to as the platform speaks to a container
-harness/play.py      one game between two agent directories
-harness/arena.py     many games, with a score
-harness/package.py   builds submission.zip with agent.py at the root
-docs/IDEAS.md        where the strength actually comes from
-```
-
-Local games start from the normal position unless you pass `--fen`. Rated games start from
-curated neutral positions.
-
-The harness is here so your games are honest, not so you can pre-validate an upload. Acceptance
-happens on the platform, and the validation log on your dashboard is the authority on it.
-
-## The rules
-
-[aichessathon.com/docs](https://aichessathon.com/docs) is canonical and changes. Read it before
-you upload.
+This repository is available under the [MIT License](LICENSE).
